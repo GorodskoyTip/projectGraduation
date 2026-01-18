@@ -4,10 +4,6 @@
 
 USING_NS_AX;
 
-constexpr float DEAD_ZONE_X = 200.0f;
-constexpr float CAMERA_FOLLOW_SPEED = 6.0f;
-constexpr float LOOK_AHEAD = 100.0f;
-
 GameScene* GameScene::create()
 {
     auto scene = new (std::nothrow) GameScene();
@@ -61,26 +57,24 @@ void GameScene::updateCamera(float dt)
 {
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
-    float screenCenterX = visibleSize.width / 2;
-    float playerScreenX = player->getPositionX() + world->getPositionX();
+    float screenCenterX = visibleSize.width * 0.5f;
+    float playerWorldX  = player->getPositionX();
 
-    float leftDead  = screenCenterX - DEAD_ZONE_X;
-    float rightDead = screenCenterX + DEAD_ZONE_X;
+    // 1. цель камеры — держать игрока в центре
+    float targetWorldX = screenCenterX - playerWorldX;
 
-    float targetWorldX = world->getPositionX() - player->getDirection() * LOOK_AHEAD;
+    // 2. ограничение по уровню
+    float minX = visibleSize.width - LEVEL_RIGHT; // правый край
+    float maxX = -LEVEL_LEFT;                     // левый край
 
-    if (playerScreenX < leftDead)
-        targetWorldX += leftDead - playerScreenX;
-    else if (playerScreenX > rightDead)
-        targetWorldX -= playerScreenX - rightDead;
+    targetWorldX = std::clamp(targetWorldX, minX, maxX);
 
-    float newX = world->getPositionX() +
-        (targetWorldX - world->getPositionX()) * CAMERA_FOLLOW_SPEED * dt;
+    // 3. плавность (можно 1.0f для мгновенного следования)
+    constexpr float CAMERA_SPEED = 10.0f;
 
-    float minX = visibleSize.width - LEVEL_RIGHT;
-    float maxX = -LEVEL_LEFT;
+    float currentX = world->getPositionX();
+    float newX = currentX + (targetWorldX - currentX) * CAMERA_SPEED * dt;
 
-    newX = std::clamp(newX, minX, maxX);
     world->setPositionX(newX);
 }
 
