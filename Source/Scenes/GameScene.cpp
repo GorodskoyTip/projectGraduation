@@ -5,7 +5,7 @@
 USING_NS_AX;
 
 constexpr float DEAD_ZONE_X = 200.0f;
-constexpr float CAMERA_FOLLOW_SPEED = 8.0f;
+constexpr float CAMERA_FOLLOW_SPEED = 6.0f;
 constexpr float LOOK_AHEAD = 100.0f;
 
 GameScene* GameScene::create()
@@ -22,28 +22,31 @@ GameScene* GameScene::create()
 
 bool GameScene::init()
 {
-    AXLOG("GAME SCENE INIT");
-
     if (!Scene::init())
         return false;
 
     world = Node::create();
     this->addChild(world);
 
-    colliders.emplace_back(ax::Rect(0, 0, 3000, 100)); //Ground
+    colliders.emplace_back(ax::Rect(0, 0, 3000, 100), ColliderType::Solid); //Ground
     auto ground = ax::LayerColor::create(ax::Color4B::RED, 3000, 100);
     ground->setPosition(0, 0);
     world->addChild(ground);
 
-    colliders.emplace_back(ax::Rect(0, 0, 50, 1000)); //Left Wall
+    colliders.emplace_back(ax::Rect(0, 0, 50, 1000), ColliderType::Solid); //Left Wall
     auto wallL = ax::LayerColor::create(ax::Color4B::GRAY, 50, 1000);
     wallL->setPosition(0, 0);
     world->addChild(wallL);
 
-    colliders.emplace_back(ax::Rect(2950, 0, 50, 1000)); //Right Wall
+    colliders.emplace_back(ax::Rect(2950, 0, 50, 1000), ColliderType::Solid); //Right Wall
     auto wallR = ax::LayerColor::create(ax::Color4B::GRAY, 50, 1000);
     wallR->setPosition(2950, 0);
     world->addChild(wallR);
+
+    colliders.emplace_back(ax::Rect(600, 150, 200, 20), ColliderType::OneWay);
+    auto platform = ax::LayerColor::create(ax::Color4B::GREEN, 150, 20);
+    platform->setPosition(600, 150);
+    world->addChild(platform);
 
 
     player = Player::create();
@@ -128,20 +131,39 @@ void GameScene::update(float dt)
 
     for (const auto& col : colliders)
     {
-        if (col.rect.size.height > 200)
-            continue;
-
         if (!rectY.intersectsRect(col.rect))
             continue;
 
-        if (player->velocity.y < 0)
+        if (col.type == ColliderType::OneWay)
         {
-            float penetration = col.rect.getMaxY() - rectY.getMinY();
+            if (player->velocity.y >= 0)
+                continue;
+
+            float prevBottom = rectY.getMinY() - player->velocity.y * dt;
+            float platformTop = col.rect.getMaxY();
+
+            if (prevBottom < platformTop)
+                continue;
+
+            float penetration = platformTop - rectY.getMinY();
             pos.y += penetration;
 
             player->setPosition(pos);
             player->velocity.y = 0;
             player->setOnGround(true);
+        }
+
+        else if (col.type == ColliderType::Solid)
+        {
+            if (player->velocity.y < 0)
+            {
+                float penetration = col.rect.getMaxY() - rectY.getMinY();
+                pos.y += penetration;
+
+                player->setPosition(pos);
+                player->velocity.y = 0;
+                player->setOnGround(true);
+            }
         }
     }
 
