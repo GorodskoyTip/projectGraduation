@@ -4,6 +4,9 @@
 class Player : public ax::Sprite
 {
 public:
+
+    ax::Vec2 velocity;
+
     static Player* create();
     virtual bool init() override;
     virtual void update(float dt) override;
@@ -16,8 +19,11 @@ public:
 
     float getDirection() const;
 
+    ax::Rect getPhysicsRect() const;
+    void setOnGround(bool value);
+    bool isOnGround() const;
+
 private:
-    ax::Vec2 velocity;
 
     bool moveLeft  = false;
     bool moveRight = false;

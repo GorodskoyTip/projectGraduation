@@ -30,6 +30,12 @@ bool GameScene::init()
     world = Node::create();
     this->addChild(world);
 
+    auto groundVisual = ax::LayerColor::create(ax::Color4B::BLUE, 3000, 100);
+    groundVisual->setPosition(0, 0);
+    world->addChild(groundVisual);
+
+    colliders.emplace_back(ax::Rect(0, 0, 3000, 100));
+
     player = Player::create();
     player->setPosition(0, 240);
     world->addChild(player);
@@ -44,11 +50,8 @@ bool GameScene::init()
     return true;
 }
 
-void GameScene::update(float dt)
+void GameScene::updateCamera(float dt)
 {
-    if (!world || !player)
-        return;
-
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
     float screenCenterX = visibleSize.width / 2;
@@ -72,4 +75,42 @@ void GameScene::update(float dt)
 
     newX = std::clamp(newX, minX, maxX);
     world->setPositionX(newX);
+}
+
+void GameScene::update(float dt)
+{
+    if (!world || !player)
+        return;
+
+    player->update(dt);
+
+    player->setOnGround(false);
+
+    auto playerRect  = player->getPhysicsRect();
+
+    for (const auto& col : colliders)
+    {
+        if (playerRect.intersectsRect(col.rect))
+        {
+            float playerBottom = playerRect.getMinY();
+            float groundTop    = col.rect.getMaxY();
+
+            if (playerBottom < groundTop)
+            {
+                float penetration = col.rect.getMaxY() - playerRect.getMinY();
+
+                if (penetration > 0 && player->velocity.y <= 0)
+                {
+                    auto pos = player->getPosition();
+                    pos.y += penetration;
+
+                    player->setPosition(pos);
+                    player->velocity.y = 0;
+                    player->setOnGround(true);
+                }
+            }
+        }
+    }
+
+    updateCamera(dt);
 }

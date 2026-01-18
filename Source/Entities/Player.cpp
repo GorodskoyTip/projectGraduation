@@ -108,3 +108,22 @@ float Player::getDirection() const
         return -1.0f;
     return 0.0f;
 }
+
+ax::Rect Player::getPhysicsRect() const
+{
+    constexpr float PHYS_WIDTH = 40.0f;
+    constexpr float PHYS_HEIGHT = 80.0f;
+
+    auto pos = getPosition();
+    return ax::Rect(pos.x - PHYS_WIDTH / 2, pos.y - PHYS_HEIGHT / 2, PHYS_WIDTH, PHYS_HEIGHT);
+}
+
+void Player::setOnGround(bool value)
+{
+    onGround = value;
+}
+
+bool Player::isOnGround() const
+{
+    return onGround;
+}
