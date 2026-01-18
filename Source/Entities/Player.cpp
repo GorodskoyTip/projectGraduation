@@ -3,9 +3,12 @@
 
 USING_NS_AX;
 
-static constexpr float MOVE_SPEED = 200.0f;
-static constexpr float JUMP_SPEED = 420.0f;
-static constexpr float GRAVITY    = -900.0f;
+static constexpr float MOVE_SPEED        = 200.0f;
+static constexpr float AIR_MOVE_SPEED    = 80.0f;
+static constexpr float AIR_MOVE_FROM_RUN = 200.0f;
+static constexpr float AIR_ACCEL         = 600.0f;
+static constexpr float JUMP_SPEED        = 420.0f;
+static constexpr float GRAVITY           = -900.0f;
 
 Player* Player::create()
 {
@@ -35,16 +38,22 @@ bool Player::init()
 
 void Player::onKeyPressed(EventKeyboard::KeyCode key, Event*)
 {
-    if (key == EventKeyboard::KeyCode::KEY_A) moveLeft = true;
-    if (key == EventKeyboard::KeyCode::KEY_D) moveRight = true;
+    if (key == EventKeyboard::KeyCode::KEY_A)
+        moveLeft = true;
+    if (key == EventKeyboard::KeyCode::KEY_D)
+        moveRight = true;
 
-    if (key == EventKeyboard::KeyCode::KEY_SPACE && onGround)
+    if (key == EventKeyboard::KeyCode::KEY_SPACE)
     {
-        velocity.y = JUMP_SPEED;
-        onGround   = false;
-    }
+        if (onGround && (state == PlayerState::Idle || state == PlayerState::Run))
+        {
+            velocity.y = JUMP_SPEED;
+            onGround   = false;
 
-    AXLOG("KEY PRESSED: %d", (int)key);
+            jumpFromRun = (state == PlayerState::Run);
+            state = PlayerState::Jump;
+        }
+    }
 }
 
 void Player::onKeyReleased(EventKeyboard::KeyCode key, Event*)
@@ -55,12 +64,87 @@ void Player::onKeyReleased(EventKeyboard::KeyCode key, Event*)
 
 void Player::update(float dt)
 {
-    if (moveLeft)
-        velocity.x = -MOVE_SPEED;
-    else if (moveRight)
-        velocity.x = MOVE_SPEED;
-    else
+    switch (state)
+    {
+    case PlayerState::Idle:
         velocity.x = 0;
+
+        if (moveLeft || moveRight)
+            state = PlayerState::Run;
+
+        if (!onGround)
+            state = PlayerState::Fall;
+
+        break;
+
+    case PlayerState::Run:
+        if (moveLeft)
+            velocity.x = -MOVE_SPEED;
+        else if (moveRight)
+            velocity.x = MOVE_SPEED;
+        else
+        {
+            velocity.x = 0;
+            state      = PlayerState::Idle;
+        }
+
+        if (!onGround)
+        {
+            jumpFromRun = true;
+            state       = PlayerState::Fall;
+        }
+
+        break;
+
+    case PlayerState::Jump:
+        if (!jumpFromRun)
+        {
+            if (moveLeft)
+                velocity.x = -AIR_MOVE_SPEED;
+            else if (moveRight)
+                velocity.x = AIR_MOVE_SPEED;
+        }
+        else
+        {
+            if (moveLeft)
+                velocity.x -= AIR_ACCEL * dt;
+            else if (moveRight)
+                velocity.x += AIR_ACCEL * dt;
+
+            velocity.x = std::clamp(velocity.x, -AIR_MOVE_FROM_RUN, AIR_MOVE_FROM_RUN);
+        }
+
+        if (velocity.y <= 0)
+            state = PlayerState::Fall;
+
+        break;
+
+    case PlayerState::Fall:
+        if (!jumpFromRun)
+        {
+            if (moveLeft)
+                velocity.x = -AIR_MOVE_SPEED;
+            else if (moveRight)
+                velocity.x = AIR_MOVE_SPEED;
+        }
+        else
+        {
+            if (moveLeft)
+                velocity.x -= AIR_ACCEL * dt;
+            else if (moveRight)
+                velocity.x += AIR_ACCEL * dt;
+
+            velocity.x = std::clamp(velocity.x, -AIR_MOVE_FROM_RUN, AIR_MOVE_FROM_RUN);
+        }
+
+        if (onGround)
+        {
+            jumpFromRun = false;
+            state       = PlayerState::Idle;
+        }
+
+        break;
+    }
 
     velocity.y += GRAVITY * dt;
 }
@@ -81,15 +165,6 @@ void Player::onExit()
 {
     _eventDispatcher->removeEventListenersForTarget(this);
     Sprite::onExit();
-}
-
-float Player::getDirection() const
-{
-    if (velocity.x > 0)
-        return 1.0f;
-    if (velocity.x < 0)
-        return -1.0f;
-    return 0.0f;
 }
 
 ax::Rect Player::getPhysicsRect() const
