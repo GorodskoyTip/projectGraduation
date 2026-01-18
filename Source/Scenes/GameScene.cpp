@@ -30,21 +30,25 @@ bool GameScene::init()
     world = Node::create();
     this->addChild(world);
 
-    auto groundVisual = ax::LayerColor::create(ax::Color4B::BLUE, 3000, 100);
-    groundVisual->setPosition(0, 0);
-    world->addChild(groundVisual);
+    colliders.emplace_back(ax::Rect(0, 0, 3000, 100)); //Ground
+    auto ground = ax::LayerColor::create(ax::Color4B::RED, 3000, 100);
+    ground->setPosition(0, 0);
+    world->addChild(ground);
 
-    colliders.emplace_back(ax::Rect(0, 0, 3000, 100));
+    colliders.emplace_back(ax::Rect(0, 0, 50, 1000)); //Left Wall
+    auto wallL = ax::LayerColor::create(ax::Color4B::GRAY, 50, 1000);
+    wallL->setPosition(0, 0);
+    world->addChild(wallL);
+
+    colliders.emplace_back(ax::Rect(2950, 0, 50, 1000)); //Right Wall
+    auto wallR = ax::LayerColor::create(ax::Color4B::GRAY, 50, 1000);
+    wallR->setPosition(2950, 0);
+    world->addChild(wallR);
+
 
     player = Player::create();
-    player->setPosition(0, 240);
+    player->setPosition(200, 240);
     world->addChild(player);
-
-
-    auto box = ax::LayerColor::create(ax::Color4B::RED, 50, 50);
-    box->setPosition(200, 240);
-    world->addChild(box);
-
 
     scheduleUpdate();
     return true;
@@ -84,31 +88,60 @@ void GameScene::update(float dt)
 
     player->update(dt);
 
-    player->setOnGround(false);
+    auto pos = player->getPosition();
+    pos.x += player->velocity.x * dt;
+    player->setPosition(pos);
 
-    auto playerRect  = player->getPhysicsRect();
+    auto rectX = player->getPhysicsRect();
 
     for (const auto& col : colliders)
     {
-        if (playerRect.intersectsRect(col.rect))
+        if (col.rect.size.height < 200)
+            continue;
+
+        if (!rectX.intersectsRect(col.rect))
+            continue;
+
+        if (player->velocity.x > 0)
         {
-            float playerBottom = playerRect.getMinY();
-            float groundTop    = col.rect.getMaxY();
+            float penetration = rectX.getMaxX() - col.rect.getMinX();
+            pos.x -= penetration;
+        }
+        else if (player->velocity.x < 0)
+        {
+            float penetration = col.rect.getMaxX() - rectX.getMinX();
+            pos.x += penetration;
+        }
 
-            if (playerBottom < groundTop)
-            {
-                float penetration = col.rect.getMaxY() - playerRect.getMinY();
+        player->setPosition(pos);
+        player->velocity.x = 0;
+        break;
+    }
 
-                if (penetration > 0 && player->velocity.y <= 0)
-                {
-                    auto pos = player->getPosition();
-                    pos.y += penetration;
+    pos = player->getPosition();
+    pos.y += player->velocity.y * dt;
+    player->setPosition(pos);
 
-                    player->setPosition(pos);
-                    player->velocity.y = 0;
-                    player->setOnGround(true);
-                }
-            }
+    player->setOnGround(false);
+
+    auto rectY = player->getPhysicsRect();
+
+    for (const auto& col : colliders)
+    {
+        if (col.rect.size.height > 200)
+            continue;
+
+        if (!rectY.intersectsRect(col.rect))
+            continue;
+
+        if (player->velocity.y < 0)
+        {
+            float penetration = col.rect.getMaxY() - rectY.getMinY();
+            pos.y += penetration;
+
+            player->setPosition(pos);
+            player->velocity.y = 0;
+            player->setOnGround(true);
         }
     }
 

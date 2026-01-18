@@ -30,7 +30,6 @@ bool Player::init()
     AXLOG("PLAYER INIT OK");
     velocity = Vec2::ZERO;
 
-    scheduleUpdate();
     return true;
 }
 
@@ -64,22 +63,6 @@ void Player::update(float dt)
         velocity.x = 0;
 
     velocity.y += GRAVITY * dt;
-
-    auto pos = getPosition() + velocity * dt;
-
-    if (pos.y < 100)
-    {
-        pos.y      = 100;
-        velocity.y = 0;
-        onGround   = true;
-    }
-
-    float halfWidth = getBoundingBox().size.width / 2;
-
-    pos.x = std::clamp(pos.x, LEVEL_LEFT + halfWidth, LEVEL_RIGHT - halfWidth);
-
-    setPosition(pos);
-
 }
 
 void Player::onEnter()
