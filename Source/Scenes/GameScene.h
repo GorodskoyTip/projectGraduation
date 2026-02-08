@@ -2,6 +2,7 @@
 
 #include "axmol.h"
 #include "Core/Collider.h"
+#include "Core/PhysicsSystem.h"
 
 #include <vector>
 
@@ -18,6 +19,5 @@ public:
 private:
     Player* player = nullptr;
     Node* world = nullptr;
-
-    std::vector<Collider> colliders;
+    PhysicsSystem physics;
 };

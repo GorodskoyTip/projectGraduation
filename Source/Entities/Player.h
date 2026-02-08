@@ -1,5 +1,6 @@
 #pragma once
 #include "axmol.h"
+#include "Core/CollisionResolver.h"
 
 enum class PlayerState
 {
