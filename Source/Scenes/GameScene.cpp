@@ -1,5 +1,6 @@
 #include "GameScene.h"
 #include "Entities/Player.h"
+#include "Entities/Enemy.h"
 #include "Core/LevelBounds.h"
 
 USING_NS_AX;
@@ -49,6 +50,10 @@ bool GameScene::init()
     player->setPosition(200, 240);
     world->addChild(player);
 
+    enemy = Enemy::create();
+    enemy->setPosition(1000, 540);
+    world->addChild(enemy);
+
     scheduleUpdate();
     return true;
 }
@@ -84,6 +89,10 @@ void GameScene::update(float dt)
         return;
 
     player->update(dt);
-    physics.update(player, dt);
+    physics.updatePlayer(player, dt);
+
+    enemy->update(dt);
+    physics.updateEnemy(enemy, dt);
+
     updateCamera(dt);
 }

@@ -1,5 +1,6 @@
 #include "PhysicsSystem.h"
 #include "Entities/Player.h"
+#include "Entities/Enemy.h"
 
 void PhysicsSystem::addCollider(const Collider& col) { colliders.push_back(col); }
 
@@ -85,8 +86,55 @@ void PhysicsSystem::moveAndCollideY(Player* player, float dt)
     }
 }
 
-void PhysicsSystem::update(Player* player, float dt)
+void PhysicsSystem::updatePlayer(Player* player, float dt)
 {
     moveAndCollideX(player, dt);
     moveAndCollideY(player, dt);
+}
+
+void PhysicsSystem::updateEnemy(Enemy* enemy, float dt)
+{
+    auto pos = enemy->getPosition();
+    pos.x += enemy->velocity.x * dt;
+    enemy->setPosition(pos);
+
+    auto rect = enemy->getPhysicsRect();
+
+    for (const auto& col : colliders)
+    {
+        if (col.rect.size.height < 200)
+            continue;
+        if (!rect.intersectsRect(col.rect))
+            continue;
+        if (enemy->velocity.x > 0)
+            pos.x -= rect.getMaxX() - col.rect.getMinX();
+        else
+            pos.x += col.rect.getMaxX() - rect.getMinX();
+
+        enemy->setPosition(pos);
+        enemy->changeDirection();
+        enemy->velocity.x = 0;
+        break;
+    }
+
+    pos = enemy->getPosition();
+    pos.y += enemy->velocity.y * dt;
+    enemy->setPosition(pos);
+
+    enemy->setOnGround(false);
+
+    rect = enemy->getPhysicsRect();
+
+    for (const auto& col : colliders)
+    {
+        if (!rect.intersectsRect(col.rect))
+            continue;
+        if (enemy->velocity.y < 0)
+        {
+            pos.y += col.rect.getMaxY() - rect.getMinY();
+            enemy->setPosition(pos);
+            enemy->velocity.y = 0;
+            enemy->setOnGround(true);
+        }
+    }
 }

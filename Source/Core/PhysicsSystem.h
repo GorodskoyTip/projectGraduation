@@ -4,12 +4,14 @@
 #include "Collider.h"
 
 class Player;
+class Enemy;
 
 class PhysicsSystem
 {
 public:
     void addCollider(const Collider& col);
-    void update(Player* player, float dt);
+    void updatePlayer(Player* player, float dt);
+    void updateEnemy(Enemy* enemy, float dt);
 
 private:
     std::vector<Collider> colliders;
