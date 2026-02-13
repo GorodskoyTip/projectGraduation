@@ -32,11 +32,26 @@ public:
     void setOnGround(bool value);
     bool isOnGround() const;
 
+    float getHP();
+
+    void receiveDamage(int amount);
+
 private:
+    void updateIdle(float dt);
+    void updateRun(float dt);
+    void updateJump(float dt);
+    void updateFall(float dt);
+    void handleAirMovement(float dt);
+
     PlayerState state = PlayerState::Idle;
     bool jumpFromRun  = false;
 
     bool moveLeft  = false;
     bool moveRight = false;
     bool onGround  = false;
+
+    float invincibilityTimer;
+    bool isInvincible;
+
+    float hp = 100;
 };

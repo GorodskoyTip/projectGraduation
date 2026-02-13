@@ -116,6 +116,25 @@ void PhysicsSystem::updateEnemy(Enemy* enemy, float dt)
         enemy->velocity.x = 0;
         break;
     }
+    // Проверка края платформы
+    if (enemy->velocity.x != 0)
+    {
+        auto pos = enemy->getPosition();
+
+        float forwardOffset = 25.0f;  // чуть вперёд
+        float downOffset    = 45.0f;  // вниз от центра (к ногам)
+
+        float checkX = pos.x + (enemy->velocity.x > 0 ? forwardOffset : -forwardOffset);
+        float checkY = pos.y - downOffset;
+
+        ax::Vec2 checkPoint(checkX, checkY);
+
+        if (!hasGroundBelow(checkPoint))
+        {
+            enemy->changeDirection();
+        }
+    }
+
 
     pos = enemy->getPosition();
     pos.y += enemy->velocity.y * dt;
@@ -137,4 +156,20 @@ void PhysicsSystem::updateEnemy(Enemy* enemy, float dt)
             enemy->setOnGround(true);
         }
     }
+}
+
+bool PhysicsSystem::hasGroundBelow(const ax::Vec2& point) const
+{
+    ax::Rect probe(point.x - 2, point.y - 2, 4, 4);
+
+    for (const auto& col : colliders)
+    {
+        if (col.type == ColliderType::Solid || col.type == ColliderType::OneWay)
+        {
+            if (probe.intersectsRect(col.rect))
+                return true;
+        }
+    }
+
+    return false;
 }

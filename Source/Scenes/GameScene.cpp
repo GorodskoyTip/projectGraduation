@@ -3,6 +3,8 @@
 #include "Entities/Enemy.h"
 #include "Core/LevelBounds.h"
 
+#include <iostream>
+
 USING_NS_AX;
 
 GameScene* GameScene::create()
@@ -15,6 +17,15 @@ GameScene* GameScene::create()
     }
     AX_SAFE_DELETE(scene);
     return nullptr;
+}
+
+void GameScene::spawnEnemy(const ax::Vec2& position)
+{
+    auto enemy = Enemy::create();
+    enemy->setPosition(position);
+    world->addChild(enemy);
+
+    enemies.push_back(enemy);
 }
 
 bool GameScene::init()
@@ -50,9 +61,8 @@ bool GameScene::init()
     player->setPosition(200, 240);
     world->addChild(player);
 
-    enemy = Enemy::create();
-    enemy->setPosition(1000, 540);
-    world->addChild(enemy);
+    spawnEnemy({800, 240});
+    spawnEnemy({200, 240});
 
     scheduleUpdate();
     return true;
@@ -91,8 +101,17 @@ void GameScene::update(float dt)
     player->update(dt);
     physics.updatePlayer(player, dt);
 
-    enemy->update(dt);
-    physics.updateEnemy(enemy, dt);
+    for (auto enemy : enemies)
+    {
+        enemy->update(dt);
+        physics.updateEnemy(enemy, dt);
+
+        if (player->getPhysicsRect().intersectsRect(enemy->getPhysicsRect()))
+        {
+            player->receiveDamage(1);
+            std::cout << player->getHP();
+        }
+    }
 
     updateCamera(dt);
 }

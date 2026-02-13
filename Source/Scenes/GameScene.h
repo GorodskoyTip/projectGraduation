@@ -17,9 +17,12 @@ public:
     virtual void update(float dt) override;
     void updateCamera(float dt);
 
+    void spawnEnemy(const ax::Vec2& position);
+
+
 private:
     Player* player = nullptr;
-    Enemy* enemy   = nullptr;
+    std::vector<Enemy*> enemies;
     Node* world    = nullptr;
     PhysicsSystem physics;
 };

@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Core/LevelBounds.h"
+#include <algorithm>
 
 USING_NS_AX;
 
@@ -62,93 +63,6 @@ void Player::onKeyReleased(EventKeyboard::KeyCode key, Event*)
     if (key == EventKeyboard::KeyCode::KEY_D) moveRight = false;
 }
 
-void Player::update(float dt)
-{
-    switch (state)
-    {
-    case PlayerState::Idle:
-        velocity.x = 0;
-
-        if (moveLeft || moveRight)
-            state = PlayerState::Run;
-
-        if (!onGround)
-            state = PlayerState::Fall;
-
-        break;
-
-    case PlayerState::Run:
-        if (moveLeft)
-            velocity.x = -MOVE_SPEED;
-        else if (moveRight)
-            velocity.x = MOVE_SPEED;
-        else
-        {
-            velocity.x = 0;
-            state      = PlayerState::Idle;
-        }
-
-        if (!onGround)
-        {
-            jumpFromRun = true;
-            state       = PlayerState::Fall;
-        }
-
-        break;
-
-    case PlayerState::Jump:
-        if (!jumpFromRun)
-        {
-            if (moveLeft)
-                velocity.x = -AIR_MOVE_SPEED;
-            else if (moveRight)
-                velocity.x = AIR_MOVE_SPEED;
-        }
-        else
-        {
-            if (moveLeft)
-                velocity.x -= AIR_ACCEL * dt;
-            else if (moveRight)
-                velocity.x += AIR_ACCEL * dt;
-
-            velocity.x = std::clamp(velocity.x, -AIR_MOVE_FROM_RUN, AIR_MOVE_FROM_RUN);
-        }
-
-        if (velocity.y <= 0)
-            state = PlayerState::Fall;
-
-        break;
-
-    case PlayerState::Fall:
-        if (!jumpFromRun)
-        {
-            if (moveLeft)
-                velocity.x = -AIR_MOVE_SPEED;
-            else if (moveRight)
-                velocity.x = AIR_MOVE_SPEED;
-        }
-        else
-        {
-            if (moveLeft)
-                velocity.x -= AIR_ACCEL * dt;
-            else if (moveRight)
-                velocity.x += AIR_ACCEL * dt;
-
-            velocity.x = std::clamp(velocity.x, -AIR_MOVE_FROM_RUN, AIR_MOVE_FROM_RUN);
-        }
-
-        if (onGround)
-        {
-            jumpFromRun = false;
-            state       = PlayerState::Idle;
-        }
-
-        break;
-    }
-
-    velocity.y += GRAVITY * dt;
-}
-
 void Player::onEnter()
 {
     Sprite::onEnter();
@@ -169,7 +83,7 @@ void Player::onExit()
 
 ax::Rect Player::getPhysicsRect() const
 {
-    constexpr float PHYS_WIDTH = 40.0f;
+    constexpr float PHYS_WIDTH  = 40.0f;
     constexpr float PHYS_HEIGHT = 80.0f;
 
     auto pos = getPosition();
@@ -185,3 +99,117 @@ bool Player::isOnGround() const
 {
     return onGround;
 }
+
+float Player::getHP()
+{
+    return hp;
+}
+
+void Player::receiveDamage(int amount)
+{
+    if (!isInvincible && hp > 0)
+    {
+        hp = std::max(0.0f, hp-amount);
+        isInvincible = true;
+        invincibilityTimer = 1;
+    }
+}
+
+void Player::updateIdle(float dt)
+{
+    velocity.x = 0;
+
+    if (moveLeft || moveRight)
+        state = PlayerState::Run;
+
+    if (!onGround)
+        state = PlayerState::Fall;
+}
+
+void Player::updateRun(float dt)
+{
+    if (moveLeft)
+        velocity.x = -MOVE_SPEED;
+    else if (moveRight)
+        velocity.x = MOVE_SPEED;
+    else
+    {
+        velocity.x = 0;
+        state      = PlayerState::Idle;
+    }
+
+    if (!onGround)
+    {
+        jumpFromRun = true;
+        state       = PlayerState::Fall;
+    }
+}
+
+void Player::updateJump(float dt)
+{
+    handleAirMovement(dt);
+
+    if (velocity.y <= 0)
+        state = PlayerState::Fall;
+}
+
+void Player::updateFall(float dt)
+{
+    handleAirMovement(dt);
+
+    if (onGround)
+    {
+        jumpFromRun = false;
+        state       = PlayerState::Idle;
+    }
+}
+
+void Player::handleAirMovement(float dt)
+{
+    if (!jumpFromRun)
+    {
+        if (moveLeft)
+            velocity.x = -AIR_MOVE_SPEED;
+        else if (moveRight)
+            velocity.x = AIR_MOVE_SPEED;
+    }
+    else
+    {
+        if (moveLeft)
+            velocity.x -= AIR_ACCEL * dt;
+        else if (moveRight)
+            velocity.x += AIR_ACCEL * dt;
+
+        velocity.x = std::clamp(velocity.x, -AIR_MOVE_FROM_RUN, AIR_MOVE_FROM_RUN);
+    }
+}
+
+void Player::update(float dt)
+{
+    switch (state)
+    {
+    case PlayerState::Idle:
+        updateIdle(dt);
+        break;
+    case PlayerState::Run:
+        updateRun(dt);
+        break;
+    case PlayerState::Jump:
+        updateJump(dt);
+        break;
+    case PlayerState::Fall:
+        updateFall(dt);
+        break;
+    }
+
+    if (invincibilityTimer > 0)
+        invincibilityTimer -= dt;
+    else if (invincibilityTimer <= 0)
+    {
+        isInvincible = false;
+        invincibilityTimer = 0;
+    }
+
+    velocity.y += GRAVITY * dt;
+}
+
