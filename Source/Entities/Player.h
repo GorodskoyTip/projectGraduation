@@ -21,6 +21,8 @@ public:
     virtual void update(float dt) override;
 
     PlayerState getState() const { return state; }
+    void updateAnimation();
+    ax::Animation* createAnimation(const std::string& prefix, float delay);
 
     void onKeyPressed(ax::EventKeyboard::KeyCode keyCode, ax::Event* event);
     void onKeyReleased(ax::EventKeyboard::KeyCode keyCode, ax::Event* event);
@@ -52,6 +54,14 @@ private:
 
     float invincibilityTimer;
     bool isInvincible;
+
+    bool facingRight = true;
+    void updateFacingDirection();
+    ax::Animation* idleAnim;
+    ax::Animation* runAnim;
+    ax::Animation* jumpAnim;
+    ax::Animation* fallAnim;
+    PlayerState currentAnimationState;
 
     float hp = 100;
 };

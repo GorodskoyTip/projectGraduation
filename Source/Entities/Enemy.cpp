@@ -19,7 +19,7 @@ Enemy* Enemy::create()
 
 bool Enemy::init()
 {
-    if (!Sprite::initWithFile("Content/frames/killed/killed.png"))
+    if (!Sprite::initWithFile("Content/Sprites/RedHood/killed/killed.png"))
         return false;
 
     velocity = Vec2::ZERO;
