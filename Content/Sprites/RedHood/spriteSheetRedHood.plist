@@ -1665,11 +1665,11 @@
       <key>premultiplyAlpha</key>
       <false/>
       <key>realTextureFileName</key>
-      <string>spriteSheet.png</string>
+      <string>spriteSheetRedHood.png</string>
       <key>size</key>
       <string>{567,308}</string>
       <key>textureFileName</key>
-      <string>spriteSheet.png</string>
+      <string>spriteSheetRedHood.png</string>
     </dict>
   </dict>
 </plist>

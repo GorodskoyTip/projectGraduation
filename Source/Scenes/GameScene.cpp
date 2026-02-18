@@ -1,6 +1,6 @@
 #include "GameScene.h"
 #include "Entities/Player.h"
-#include "Entities/Enemy.h"
+#include "Entities/Canine.h"
 #include "Core/LevelBounds.h"
 
 #include <iostream>
@@ -83,11 +83,13 @@ void GameScene::updateCamera(float dt)
 
 void GameScene::update(float dt)
 {
-    if (!world || !player)
+    if (!world || !player || !canine)
         return;
 
     player->update(dt);
     physics.updatePlayer(player, dt);
+
+    canine->update(dt);
 
     updateCamera(dt);
 }

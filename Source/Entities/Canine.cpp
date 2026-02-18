@@ -22,13 +22,18 @@ bool Canine::init()
     if (!initBase())
         return false;
 
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Content/Sprites/CanineBlack/spriteSheet.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Content/Sprites/CanineBlack/spriteSheetCanineBlack.plist");
 
     if (!initWithSpriteFrameName("idle_1.png"))
     {
         AXLOG("ENEMY SPRITE NOT LOADED");
         return false;
     }
+
+    idleAnim = createAnimation("idle", 0.1f);
+    runAnim  = createAnimation("run", 0.035f);
+    fallAnim = createAnimation("run", 0.1f);
+    deadAnim = createAnimation("dead", 0.035f);
 
     aggroRange  = 400.f;
     attackRange = 60.f;

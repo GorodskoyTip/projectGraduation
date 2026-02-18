@@ -39,6 +39,34 @@ void Enemy::handleDead(float dt) {}
 
 void Enemy::updateAI(float dt) {}
 
+ax::Animation* Enemy::createAnimation(const std::string prefix, float delay)
+{
+    Vector<SpriteFrame*> frames;
+    int index = 1;
+
+    while (true)
+    {
+        std::string name   = prefix + "_" + std::to_string(index) + ".png";
+        SpriteFrame* frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(name);
+
+        if (frame == nullptr)
+            break;
+
+        frames.pushBack(frame);
+        index++;
+    }
+
+    if (frames.empty())
+    {
+        AXLOG("No frames found for %s", prefix.c_str());
+        return nullptr;
+    }
+
+    auto animation = Animation::createWithSpriteFrames(frames, delay);
+    AnimationCache::getInstance()->addAnimation(animation, prefix);
+    return animation;
+}
+
 void Enemy::update(float dt)
 {
     updateAI(dt);

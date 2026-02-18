@@ -27,6 +27,7 @@ public:
     void setTarget(Player* player);
 
     void setState(EnemyState newState);
+    ax::Animation* createAnimation(const std::string prefix, float delay);
 
     void receiveDamage(float amount);
     void onDeath();

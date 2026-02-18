@@ -25,7 +25,7 @@ Player* Player::create()
 
 bool Player::init()
 {
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Content/Sprites/RedHood/spriteSheet.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Content/Sprites/RedHood/spriteSheetRedHood.plist");
 
     if (!initWithSpriteFrameName("idle_1.png"))
     {
