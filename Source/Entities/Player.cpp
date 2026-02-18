@@ -11,7 +11,6 @@ static constexpr float AIR_ACCEL         = 600.0f;
 static constexpr float JUMP_SPEED        = 420.0f;
 static constexpr float GRAVITY           = -900.0f;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 Player* Player::create()
 {
     Player* p = new (std::nothrow) Player();
@@ -50,8 +49,6 @@ bool Player::init()
 
     return true;
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Player::onKeyPressed(EventKeyboard::KeyCode key, Event*)
 {
@@ -97,23 +94,6 @@ void Player::onExit()
     Sprite::onExit();
 }
 
-ax::Vec2 Player::getVelocity()
-{
-    return velocity;
-}
-
-void Player::setVelocityX(float x)
-{
-    velocity.x = x;
-}
-
-void Player::setVelocityY(float y)
-{
-    velocity.y = y;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 ax::Rect Player::getPhysicsRect() const
 {
     constexpr float PHYS_WIDTH  = 40.0f;
@@ -133,6 +113,74 @@ bool Player::isOnGround() const
     return onGround;
 }
 
+ax::Vec2 Player::getVelocity()
+{
+    return velocity;
+}
+
+void Player::setVelocityX(float x)
+{
+    velocity.x = x;
+}
+
+void Player::setVelocityY(float y)
+{
+    velocity.y = y;
+}
+
+void Player::updateAnimation()
+{
+    if (state == currentAnimationState)
+        return;
+
+    stopAllActions();
+
+    switch (state)
+    {
+    case PlayerState::Idle:
+        runAction(RepeatForever::create(Animate::create(idleAnim)));
+        break;
+    case PlayerState::Run:
+        runAction(RepeatForever::create(Animate::create(runAnim)));
+        break;
+    case PlayerState::Jump:
+        runAction(Animate::create(jumpAnim));
+        break;
+    case PlayerState::Fall:
+        runAction(RepeatForever::create(Animate::create(fallAnim)));
+        break;
+    }
+    currentAnimationState = state;
+}
+
+ax::Animation* Player::createAnimation(const std::string& prefix, float delay)
+{
+    Vector<SpriteFrame*> frames;
+    int index = 1;
+
+    while (true)
+    {
+        std::string name = prefix + "_" + std::to_string(index) + ".png";
+        SpriteFrame* frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(name);
+
+        if (frame == nullptr)
+            break;
+
+        frames.pushBack(frame);
+        index++;
+    }
+
+    if (frames.empty())
+    {
+        AXLOG("No frames found for %s", prefix.c_str());
+        return nullptr;
+    }
+
+    auto animation = Animation::createWithSpriteFrames(frames, delay);
+    AnimationCache::getInstance()->addAnimation(animation, prefix);
+    return animation;
+}
+
 float Player::getHP()
 {
     return hp;
@@ -147,8 +195,6 @@ void Player::receiveDamage(int amount)
         invincibilityTimer = 1;
     }
 }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Player::updateIdle(float dt)
 {
@@ -219,8 +265,6 @@ void Player::handleAirMovement(float dt)
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 void Player::updateFacingDirection()
 {
     if (velocity.x < 0.0f && !facingRight)
@@ -235,59 +279,6 @@ void Player::updateFacingDirection()
         setFlippedX(true);
         facingRight = false;
     }
-}
-
-ax::Animation* Player::createAnimation(const std::string& prefix, float delay)
-{
-    Vector<SpriteFrame*> frames;
-    int index = 1;
-
-    while (true)
-    {
-        std::string name = prefix + "_" + std::to_string(index) + ".png";
-        SpriteFrame* frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(name);
-
-        if (frame == nullptr)
-            break;
-
-        frames.pushBack(frame);
-        index++;
-    }
-
-    if (frames.empty())
-    {
-        AXLOG("No frames found for %s", prefix.c_str());
-        return nullptr;
-    }
-
-    auto animation = Animation::createWithSpriteFrames(frames, delay);
-    AnimationCache::getInstance()->addAnimation(animation, prefix);
-    return animation;
-}
-
-void Player::updateAnimation()
-{
-    if (state == currentAnimationState)
-        return;
-
-    stopAllActions();
-
-    switch (state)
-    {
-    case PlayerState::Idle:
-        runAction(RepeatForever::create(Animate::create(idleAnim)));
-        break;
-    case PlayerState::Run:
-        runAction(RepeatForever::create(Animate::create(runAnim)));
-        break;
-    case PlayerState::Jump:
-        runAction(Animate::create(jumpAnim));
-        break;
-    case PlayerState::Fall:
-        runAction(RepeatForever::create(Animate::create(fallAnim)));
-        break;
-    }
-    currentAnimationState = state;
 }
 
 void Player::update(float dt)

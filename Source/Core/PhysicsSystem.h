@@ -11,7 +11,6 @@ class PhysicsSystem
 public:
     void addCollider(const Collider& col);
     void updatePlayer(Player* player, float dt);
-    void updateEnemy(Enemy* enemy, float dt);
     bool hasGroundBelow(const ax::Vec2& point) const;
 
 private:

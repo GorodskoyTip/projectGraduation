@@ -23,6 +23,9 @@ public:
     virtual void onEnter() override;
     virtual void onExit() override;
 
+    ax::Rect getPhysicsRect() const;
+    void setOnGround(bool value);
+    bool isOnGround() const;
     ax::Vec2 getVelocity();
     void setVelocityX(float x);
     void setVelocityY(float y);
@@ -30,10 +33,6 @@ public:
     PlayerState getState() const { return state; }
     void updateAnimation();
     ax::Animation* createAnimation(const std::string& prefix, float delay);
-
-    ax::Rect getPhysicsRect() const;
-    void setOnGround(bool value);
-    bool isOnGround() const;
 
     float getHP();
 
