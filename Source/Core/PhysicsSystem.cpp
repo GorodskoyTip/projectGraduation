@@ -7,7 +7,7 @@ void PhysicsSystem::addCollider(const Collider& col) { colliders.push_back(col);
 void PhysicsSystem::moveAndCollideX(Player* player, float dt)
 {
     auto pos = player->getPosition();
-    pos.x += player->velocity.x * dt;
+    pos.x += player->getVelocity().x * dt;
     player->setPosition(pos);
 
     auto rectX = player->getPhysicsRect();
@@ -20,19 +20,19 @@ void PhysicsSystem::moveAndCollideX(Player* player, float dt)
         if (!rectX.intersectsRect(col.rect))
             continue;
 
-        if (player->velocity.x > 0)
+        if (player->getVelocity().x > 0)
         {
             float penetration = rectX.getMaxX() - col.rect.getMinX();
             pos.x -= penetration;
         }
-        else if (player->velocity.x < 0)
+        else if (player->getVelocity().x < 0)
         {
             float penetration = col.rect.getMaxX() - rectX.getMinX();
             pos.x += penetration;
         }
 
         player->setPosition(pos);
-        player->velocity.x = 0;
+        player->setVelocityX(0);
         break;
     }
 }
@@ -40,7 +40,7 @@ void PhysicsSystem::moveAndCollideX(Player* player, float dt)
 void PhysicsSystem::moveAndCollideY(Player* player, float dt)
 {
     auto pos = player->getPosition();
-    pos.y += player->velocity.y * dt;
+    pos.y += player->getVelocity().y * dt;
     player->setPosition(pos);
 
     player->setOnGround(false);
@@ -54,10 +54,10 @@ void PhysicsSystem::moveAndCollideY(Player* player, float dt)
 
         if (col.type == ColliderType::OneWay)
         {
-            if (player->velocity.y >= 0)
+            if (player->getVelocity().y >= 0)
                 continue;
 
-            float prevBottom = rectY.getMinY() - player->velocity.y * dt;
+            float prevBottom  = rectY.getMinY() - player->getVelocity().y * dt;
             float platformTop = col.rect.getMaxY();
 
             if (prevBottom < platformTop)
@@ -67,19 +67,19 @@ void PhysicsSystem::moveAndCollideY(Player* player, float dt)
             pos.y += penetration;
 
             player->setPosition(pos);
-            player->velocity.y = 0;
+            player->setVelocityY(0);
             player->setOnGround(true);
         }
 
         else if (col.type == ColliderType::Solid)
         {
-            if (player->velocity.y < 0)
+            if (player->getVelocity().y < 0)
             {
                 float penetration = col.rect.getMaxY() - rectY.getMinY();
                 pos.y += penetration;
 
                 player->setPosition(pos);
-                player->velocity.y = 0;
+                player->setVelocityY(0);
                 player->setOnGround(true);
             }
         }
@@ -95,7 +95,7 @@ void PhysicsSystem::updatePlayer(Player* player, float dt)
 void PhysicsSystem::updateEnemy(Enemy* enemy, float dt)
 {
     auto pos = enemy->getPosition();
-    pos.x += enemy->velocity.x * dt;
+    pos.x += enemy->getVelocity().x * dt;
     enemy->setPosition(pos);
 
     auto rect = enemy->getPhysicsRect();
@@ -106,25 +106,25 @@ void PhysicsSystem::updateEnemy(Enemy* enemy, float dt)
             continue;
         if (!rect.intersectsRect(col.rect))
             continue;
-        if (enemy->velocity.x > 0)
+        if (enemy->getVelocity().x > 0)
             pos.x -= rect.getMaxX() - col.rect.getMinX();
         else
             pos.x += col.rect.getMaxX() - rect.getMinX();
 
         enemy->setPosition(pos);
         enemy->changeDirection();
-        enemy->velocity.x = 0;
+        enemy->setVelocityX(0);
         break;
     }
     // Проверка края платформы
-    if (enemy->velocity.x != 0)
+    if (enemy->getVelocity().x != 0)
     {
         auto pos = enemy->getPosition();
 
         float forwardOffset = 25.0f;  // чуть вперёд
         float downOffset    = 45.0f;  // вниз от центра (к ногам)
 
-        float checkX = pos.x + (enemy->velocity.x > 0 ? forwardOffset : -forwardOffset);
+        float checkX = pos.x + (enemy->getVelocity().x > 0 ? forwardOffset : -forwardOffset);
         float checkY = pos.y - downOffset;
 
         ax::Vec2 checkPoint(checkX, checkY);
@@ -137,7 +137,7 @@ void PhysicsSystem::updateEnemy(Enemy* enemy, float dt)
 
 
     pos = enemy->getPosition();
-    pos.y += enemy->velocity.y * dt;
+    pos.y += enemy->getVelocity().y * dt;
     enemy->setPosition(pos);
 
     enemy->setOnGround(false);
@@ -148,11 +148,11 @@ void PhysicsSystem::updateEnemy(Enemy* enemy, float dt)
     {
         if (!rect.intersectsRect(col.rect))
             continue;
-        if (enemy->velocity.y < 0)
+        if (enemy->getVelocity().y < 0)
         {
             pos.y += col.rect.getMaxY() - rect.getMinY();
             enemy->setPosition(pos);
-            enemy->velocity.y = 0;
+            enemy->setVelocityY(0);
             enemy->setOnGround(true);
         }
     }

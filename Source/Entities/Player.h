@@ -14,21 +14,22 @@ class Player : public ax::Sprite
 {
 public:
 
-    ax::Vec2 velocity;
-
     static Player* create();
     virtual bool init() override;
     virtual void update(float dt) override;
 
+    void onKeyPressed(ax::EventKeyboard::KeyCode keyCode, ax::Event* event);
+    void onKeyReleased(ax::EventKeyboard::KeyCode keyCode, ax::Event* event);
+    virtual void onEnter() override;
+    virtual void onExit() override;
+
+    ax::Vec2 getVelocity();
+    void setVelocityX(float x);
+    void setVelocityY(float y);
+
     PlayerState getState() const { return state; }
     void updateAnimation();
     ax::Animation* createAnimation(const std::string& prefix, float delay);
-
-    void onKeyPressed(ax::EventKeyboard::KeyCode keyCode, ax::Event* event);
-    void onKeyReleased(ax::EventKeyboard::KeyCode keyCode, ax::Event* event);
-
-    virtual void onEnter() override;
-    virtual void onExit() override;
 
     ax::Rect getPhysicsRect() const;
     void setOnGround(bool value);
@@ -39,21 +40,20 @@ public:
     void receiveDamage(int amount);
 
 private:
-    void updateIdle(float dt);
-    void updateRun(float dt);
-    void updateJump(float dt);
-    void updateFall(float dt);
-    void handleAirMovement(float dt);
 
     PlayerState state = PlayerState::Idle;
     bool jumpFromRun  = false;
+    ax::Vec2 velocity;
 
     bool moveLeft  = false;
     bool moveRight = false;
     bool onGround  = false;
 
-    float invincibilityTimer;
-    bool isInvincible;
+    void updateIdle(float dt);
+    void updateRun(float dt);
+    void updateJump(float dt);
+    void updateFall(float dt);
+    void handleAirMovement(float dt);
 
     bool facingRight = true;
     void updateFacingDirection();
@@ -64,4 +64,7 @@ private:
     PlayerState currentAnimationState;
 
     float hp = 100;
+
+    float invincibilityTimer;
+    bool isInvincible;
 };

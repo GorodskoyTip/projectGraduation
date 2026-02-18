@@ -97,6 +97,21 @@ void Player::onExit()
     Sprite::onExit();
 }
 
+ax::Vec2 Player::getVelocity()
+{
+    return velocity;
+}
+
+void Player::setVelocityX(float x)
+{
+    velocity.x = x;
+}
+
+void Player::setVelocityY(float y)
+{
+    velocity.y = y;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ax::Rect Player::getPhysicsRect() const

@@ -19,18 +19,11 @@ Enemy* Enemy::create()
 
 bool Enemy::init()
 {
-    if (!Sprite::initWithFile("Content/Sprites/RedHood/killed/killed.png"))
+    if (!Sprite::initWithFile("Content/Sprites/CanineBlack/spriteSheet.png"))
         return false;
 
     velocity = Vec2::ZERO;
     return true;
-}
-
-void Enemy::update(float dt)
-{
-    velocity.x = direction * MOVE_SPEED;
-    if (!onGround)
-        velocity.y += GRAVITY * dt;
 }
 
 ax::Rect Enemy::getPhysicsRect() const
@@ -50,4 +43,37 @@ void Enemy::setOnGround(bool value)
 void Enemy::changeDirection()
 {
     direction *= -1;
+}
+
+ax::Vec2 Enemy::getVelocity()
+{
+    return velocity;
+}
+
+void Enemy::setVelocityX(float x)
+{
+    velocity.x = x;
+}
+
+void Enemy::setVelocityY(float y)
+{
+    velocity.y = y;
+}
+
+
+
+void Enemy::update(float dt)
+{
+    switch (state)
+    {
+    case EnemyState::Idle:
+        break;
+    case EnemyState::Patrol:
+        break;
+    case EnemyState::Dead:
+        break;
+    }
+    velocity.x = direction * MOVE_SPEED;
+    if (!onGround)
+        velocity.y += GRAVITY * dt;
 }
