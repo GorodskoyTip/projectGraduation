@@ -1,6 +1,9 @@
 #pragma once
 #include "axmol.h"
 
+static constexpr float MOVE_SPEED = 80.0f;
+static constexpr float GRAVITY    = -900.0f;
+
 enum class EnemyState
 {
     Idle,
@@ -8,6 +11,8 @@ enum class EnemyState
     Fall,
     Dead
 };
+
+class Player;
 
 class Enemy : public ax::Sprite
 {
@@ -21,23 +26,34 @@ public:
     void setVelocityX(float x);
     void setVelocityY(float y);
 
+    void updateAI(float dt);
+    void setTarget(Player* player);
+
+    void setState(EnemyState newState);
+
     void receiveDamage(float amount);
     void onDeath();
+    bool isDead() const { return state == EnemyState::Dead; }
 
-private:
+protected:
     ax::Vec2 velocity;
 
-    bool moveLeft = false;
-    bool moveRight = false;
+    bool facingRight = false;
     bool onGround  = false;
 
-    virtual void handleIdle(float dt);
-    virtual void handleMove(float dt);
-    virtual void handleFall(float dt);
-    virtual void handleDead(float dt);
+    Player* target = nullptr;
+
+    float aggroRange;
+    float attackRange;
 
     EnemyState state = EnemyState::Idle;
 
     float hp;
+
+private:
+    virtual void handleIdle(float dt);
+    virtual void handleMove(float dt);
+    virtual void handleFall(float dt);
+    virtual void handleDead(float dt);
 
 };

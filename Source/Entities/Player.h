@@ -13,7 +13,6 @@ enum class PlayerState
 class Player : public ax::Sprite
 {
 public:
-
     static Player* create();
     virtual bool init() override;
     virtual void update(float dt) override;
@@ -39,7 +38,6 @@ public:
     void receiveDamage(int amount);
 
 private:
-
     PlayerState state = PlayerState::Idle;
     bool jumpFromRun  = false;
     ax::Vec2 velocity;

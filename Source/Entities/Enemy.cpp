@@ -2,9 +2,6 @@
 
 USING_NS_AX;
 
-static constexpr float MOVE_SPEED = 80.0f;
-static constexpr float GRAVITY    = -900.0f;
-
 bool Enemy::initBase()
 {
     velocity = Vec2::ZERO;
@@ -37,8 +34,12 @@ void Enemy::handleFall(float dt) {}
 
 void Enemy::handleDead(float dt) {}
 
+void Enemy::updateAI(float dt) {}
+
 void Enemy::update(float dt)
 {
+    updateAI(dt);
+
     switch (state)
     {
     case EnemyState::Idle:
@@ -54,4 +55,6 @@ void Enemy::update(float dt)
         handleDead(dt);
         break;
     }
+
+    velocity.y += GRAVITY * dt;
 }
