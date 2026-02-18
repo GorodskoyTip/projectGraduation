@@ -1,9 +1,6 @@
 #pragma once
 #include "axmol.h"
 
-static constexpr float MOVE_SPEED = 80.0f;
-static constexpr float GRAVITY    = -900.0f;
-
 enum class EnemyState
 {
     Idle,
@@ -26,7 +23,7 @@ public:
     void setVelocityX(float x);
     void setVelocityY(float y);
 
-    void updateAI(float dt);
+    virtual void updateAI(float dt);
     void setTarget(Player* player);
 
     void setState(EnemyState newState);
@@ -50,7 +47,6 @@ protected:
 
     float hp;
 
-private:
     virtual void handleIdle(float dt);
     virtual void handleMove(float dt);
     virtual void handleFall(float dt);

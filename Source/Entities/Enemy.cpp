@@ -2,6 +2,9 @@
 
 USING_NS_AX;
 
+static constexpr float MOVE_SPEED = 80.0f;
+static constexpr float GRAVITY    = -900.0f;
+
 bool Enemy::initBase()
 {
     velocity = Vec2::ZERO;
