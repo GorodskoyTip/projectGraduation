@@ -4,7 +4,7 @@
   <dict>
     <key>frames</key>
     <dict>
-      <key>attack_2.png</key>
+      <key>wolfBlack_attack_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,0},{44,23}}</string>
@@ -17,7 +17,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>run_3.png</key>
+      <key>wolfBlack_run_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{44,0},{44,23}}</string>
@@ -30,7 +30,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>run_4.png</key>
+      <key>wolfBlack_run_4.png</key>
       <dict>
         <key>frame</key>
         <string>{{88,0},{44,22}}</string>
@@ -43,7 +43,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>attack_1.png</key>
+      <key>wolfBlack_attack_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{132,0},{43,22}}</string>
@@ -56,7 +56,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>run_2.png</key>
+      <key>wolfBlack_run_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{175,0},{43,22}}</string>
@@ -69,7 +69,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>run_5.png</key>
+      <key>wolfBlack_run_5.png</key>
       <dict>
         <key>frame</key>
         <string>{{218,0},{43,20}}</string>
@@ -82,7 +82,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>attack_5.png</key>
+      <key>wolfBlack_attack_5.png</key>
       <dict>
         <key>frame</key>
         <string>{{261,0},{43,16}}</string>
@@ -95,7 +95,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>death_5.png</key>
+      <key>wolfBlack_death_5.png</key>
       <dict>
         <key>frame</key>
         <string>{{304,0},{43,9}}</string>
@@ -108,7 +108,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>death_6.png</key>
+      <key>wolfBlack_death_6.png</key>
       <dict>
         <key>frame</key>
         <string>{{347,0},{43,8}}</string>
@@ -121,7 +121,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>death_7.png</key>
+      <key>wolfBlack_death_7.png</key>
       <dict>
         <key>frame</key>
         <string>{{390,0},{43,8}}</string>
@@ -134,7 +134,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>death_8.png</key>
+      <key>wolfBlack_death_8.png</key>
       <dict>
         <key>frame</key>
         <string>{{433,0},{43,8}}</string>
@@ -147,7 +147,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>attack_3.png</key>
+      <key>wolfBlack_attack_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{476,0},{42,21}}</string>
@@ -160,7 +160,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>death_3.png</key>
+      <key>wolfBlack_death_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{347,8},{42,15}}</string>
@@ -173,7 +173,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>death_4.png</key>
+      <key>wolfBlack_death_4.png</key>
       <dict>
         <key>frame</key>
         <string>{{304,9},{42,13}}</string>
@@ -186,7 +186,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>run_1.png</key>
+      <key>wolfBlack_run_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{261,16},{41,21}}</string>
@@ -212,7 +212,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>run_6.png</key>
+      <key>wolfBlack_run_6.png</key>
       <dict>
         <key>frame</key>
         <string>{{302,22},{41,20}}</string>
@@ -225,7 +225,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>attack_6.png</key>
+      <key>wolfBlack_attack_6.png</key>
       <dict>
         <key>frame</key>
         <string>{{259,37},{41,16}}</string>
@@ -238,7 +238,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>death_1.png</key>
+      <key>wolfBlack_death_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{389,8},{40,23}}</string>
@@ -251,7 +251,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>hit_1.png</key>
+      <key>wolfBlack_hit_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{343,23},{40,23}}</string>
@@ -264,7 +264,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>attack_7.png</key>
+      <key>wolfBlack_attack_7.png</key>
       <dict>
         <key>frame</key>
         <string>{{300,42},{40,19}}</string>
@@ -277,7 +277,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>death_2.png</key>
+      <key>wolfBlack_death_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{429,8},{39,20}}</string>
@@ -290,7 +290,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>hit_2.png</key>
+      <key>wolfBlack_hit_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{88,22},{39,20}}</string>
@@ -303,7 +303,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>hit_3.png</key>
+      <key>wolfBlack_hit_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,40},{39,20}}</string>
@@ -316,7 +316,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>idle_1.png</key>
+      <key>wolfBlack_idle_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{39,23},{34,23}}</string>
@@ -329,7 +329,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>idle_4.png</key>
+      <key>wolfBlack_idle_4.png</key>
       <dict>
         <key>frame</key>
         <string>{{39,46},{34,23}}</string>
@@ -342,7 +342,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>idle_2.png</key>
+      <key>wolfBlack_idle_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,60},{33,22}}</string>
@@ -355,7 +355,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>idle_3.png</key>
+      <key>wolfBlack_idle_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,82},{33,22}}</string>
@@ -368,7 +368,7 @@
         <key>sourceSize</key>
         <string>{48,32}</string>
       </dict>
-      <key>hit_4.png</key>
+      <key>wolfBlack_hit_4.png</key>
       <dict>
         <key>frame</key>
         <string>{{127,22},{32,21}}</string>
@@ -391,11 +391,11 @@
       <key>premultiplyAlpha</key>
       <false/>
       <key>realTextureFileName</key>
-      <string>spriteSheetCanineBlack.png</string>
+      <string>spriteSheetWolfBlack.png</string>
       <key>size</key>
       <string>{518,104}</string>
       <key>textureFileName</key>
-      <string>spriteSheetCanineBlack.png</string>
+      <string>spriteSheetWolfBlack.png</string>
     </dict>
   </dict>
 </plist>

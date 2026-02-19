@@ -27,7 +27,8 @@ public:
     void setTarget(Player* player);
 
     void setState(EnemyState newState);
-    ax::Animation* createAnimation(const std::string prefix, float delay);
+    ax::Animation* createAnimation(const std::string& entity, const std::string& prefix, float delay);
+    virtual void updateAnimation();
 
     void receiveDamage(float amount);
     void onDeath();
@@ -51,6 +52,6 @@ protected:
     virtual void handleIdle(float dt);
     virtual void handleMove(float dt);
     virtual void handleFall(float dt);
-    virtual void handleDead(float dt);
+    virtual void handleDeath(float dt);
 
 };

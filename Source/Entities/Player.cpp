@@ -27,7 +27,7 @@ bool Player::init()
 {
     SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Content/Sprites/RedHood/spriteSheetRedHood.plist");
 
-    if (!initWithSpriteFrameName("idle_1.png"))
+    if (!initWithSpriteFrameName("redHood_idle_1.png"))
     {
         AXLOG("PLAYER SPRITE NOT LOADED");
         return false;
@@ -38,15 +38,15 @@ bool Player::init()
     jumpAnim = createAnimation("jump", 0.05f);
     fallAnim = createAnimation("fall", 0.05f);
 
-    if (!idleAnim || !runAnim)
+    if (!idleAnim || !runAnim || !jumpAnim || !fallAnim)
     {
         AXLOG("ANIMATION CREATION FAILED");
         return false;
     }
     
-    AXLOG("PLAYER INIT OK");
     velocity = Vec2::ZERO;
 
+    AXLOG("PLAYER INIT OK");
     return true;
 }
 
@@ -160,7 +160,7 @@ ax::Animation* Player::createAnimation(const std::string& prefix, float delay)
 
     while (true)
     {
-        std::string name = prefix + "_" + std::to_string(index) + ".png";
+        std::string name   = "redHood_" + prefix + "_" + std::to_string(index) + ".png";
         SpriteFrame* frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(name);
 
         if (frame == nullptr)
@@ -177,7 +177,7 @@ ax::Animation* Player::createAnimation(const std::string& prefix, float delay)
     }
 
     auto animation = Animation::createWithSpriteFrames(frames, delay);
-    AnimationCache::getInstance()->addAnimation(animation, prefix);
+    animation->retain();
     return animation;
 }
 
@@ -196,7 +196,7 @@ void Player::receiveDamage(int amount)
     }
 }
 
-void Player::updateIdle(float dt)
+void Player::handleIdle(float dt)
 {
     velocity.x = 0;
 
@@ -207,7 +207,7 @@ void Player::updateIdle(float dt)
         state = PlayerState::Fall;
 }
 
-void Player::updateRun(float dt)
+void Player::handleRun(float dt)
 {
     if (moveLeft)
         velocity.x = -MOVE_SPEED;
@@ -226,7 +226,7 @@ void Player::updateRun(float dt)
     }
 }
 
-void Player::updateJump(float dt)
+void Player::handleJump(float dt)
 {
     handleAirMovement(dt);
 
@@ -234,7 +234,7 @@ void Player::updateJump(float dt)
         state = PlayerState::Fall;
 }
 
-void Player::updateFall(float dt)
+void Player::handleFall(float dt)
 {
     handleAirMovement(dt);
 
@@ -286,16 +286,16 @@ void Player::update(float dt)
     switch (state)
     {
     case PlayerState::Idle:
-        updateIdle(dt);
+        handleIdle(dt);
         break;
     case PlayerState::Run:
-        updateRun(dt);
+        handleRun(dt);
         break;
     case PlayerState::Jump:
-        updateJump(dt);
+        handleJump(dt);
         break;
     case PlayerState::Fall:
-        updateFall(dt);
+        handleFall(dt);
         break;
     }
     updateFacingDirection();

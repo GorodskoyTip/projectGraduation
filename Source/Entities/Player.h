@@ -46,10 +46,10 @@ private:
     bool moveRight = false;
     bool onGround  = false;
 
-    void updateIdle(float dt);
-    void updateRun(float dt);
-    void updateJump(float dt);
-    void updateFall(float dt);
+    void handleIdle(float dt);
+    void handleRun(float dt);
+    void handleJump(float dt);
+    void handleFall(float dt);
     void handleAirMovement(float dt);
 
     bool facingRight = true;
@@ -58,7 +58,7 @@ private:
     ax::Animation* runAnim;
     ax::Animation* jumpAnim;
     ax::Animation* fallAnim;
-    PlayerState currentAnimationState;
+    PlayerState currentAnimationState = PlayerState::Idle;
 
     float hp = 100;
 

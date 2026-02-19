@@ -22,18 +22,24 @@ bool Canine::init()
     if (!initBase())
         return false;
 
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Content/Sprites/CanineBlack/spriteSheetCanineBlack.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Content/Sprites/WolfBlack/spriteSheetWolfBlack.plist");
 
-    if (!initWithSpriteFrameName("idle_1.png"))
+    if (!initWithSpriteFrameName("wolfBlack_idle_1.png"))
     {
         AXLOG("ENEMY SPRITE NOT LOADED");
         return false;
     }
 
-    idleAnim = createAnimation("idle", 0.1f);
-    runAnim  = createAnimation("run", 0.035f);
-    fallAnim = createAnimation("run", 0.1f);
-    deadAnim = createAnimation("dead", 0.035f);
+    idleAnim = createAnimation("wolfBlack", "idle", 0.1f);
+    runAnim  = createAnimation("wolfBlack", "run", 0.035f);
+    fallAnim = createAnimation("wolfBlack", "idle", 0.1f);
+    deathAnim = createAnimation("wolfBlack", "death", 0.035f);
+
+    if (!idleAnim || !runAnim || !fallAnim || !deathAnim)
+    {
+        AXLOG("ANIMATION CREATION FAILED");
+        return false;
+    }
 
     aggroRange  = 400.f;
     attackRange = 60.f;
@@ -43,12 +49,45 @@ bool Canine::init()
     return true;
 }
 
-void Canine::handleIdle(float dt) {}
+void Canine::handleIdle(float dt)
+{
+    velocity.x = 0;
 
-void Canine::handleMove(float dt) {}
+    if (!onGround)
+        state = EnemyState::Fall;
+}
+
+void Canine::handleMove(float dt) {
+}
 
 void Canine::handleFall(float dt) {}
 
-void Canine::handleDead(float dt) {}
+void Canine::handleDeath(float dt) {}
 
 void Canine::updateAI(float dt) {}
+
+void Canine::updateAnimation()
+{
+    if (state == currentAnimationState)
+        return;
+
+    stopAllActions();
+
+    switch (state)
+    {
+    case EnemyState::Idle:
+        runAction(RepeatForever::create(Animate::create(idleAnim)));
+        break;
+    case EnemyState::Move:
+        runAction(RepeatForever::create(Animate::create(runAnim)));
+        break;
+    case EnemyState::Fall:
+        runAction(RepeatForever::create(Animate::create(fallAnim)));
+        break;
+    case EnemyState::Dead:
+        runAction(RepeatForever::create(Animate::create(deathAnim)));
+        break;
+    }
+
+    currentAnimationState = state;
+}

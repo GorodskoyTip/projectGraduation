@@ -10,10 +10,11 @@ void PhysicsSystem::moveAndCollideX(Player* player, float dt)
     pos.x += player->getVelocity().x * dt;
     player->setPosition(pos);
 
-    auto rectX = player->getPhysicsRect();
 
     for (const auto& col : colliders)
     {
+        auto rectX = player->getPhysicsRect();
+
         if (col.rect.size.height < 200)
             continue;
 
@@ -45,10 +46,10 @@ void PhysicsSystem::moveAndCollideY(Player* player, float dt)
 
     player->setOnGround(false);
 
-    auto rectY = player->getPhysicsRect();
-
     for (const auto& col : colliders)
     {
+        auto rectY = player->getPhysicsRect();
+
         if (!rectY.intersectsRect(col.rect))
             continue;
 
@@ -70,7 +71,6 @@ void PhysicsSystem::moveAndCollideY(Player* player, float dt)
             player->setVelocityY(0);
             player->setOnGround(true);
         }
-
         else if (col.type == ColliderType::Solid)
         {
             if (player->getVelocity().y < 0)
@@ -85,6 +85,7 @@ void PhysicsSystem::moveAndCollideY(Player* player, float dt)
         }
     }
 }
+
 
 void PhysicsSystem::updatePlayer(Player* player, float dt)
 {

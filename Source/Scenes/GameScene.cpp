@@ -52,6 +52,10 @@ bool GameScene::init()
     player->setPosition(200, 240);
     world->addChild(player);
 
+    canine = Canine::create();
+    canine->setPosition(400, 240);
+    world->addChild(canine);
+
     scheduleUpdate();
     return true;
 }
@@ -83,13 +87,13 @@ void GameScene::updateCamera(float dt)
 
 void GameScene::update(float dt)
 {
-    if (!world || !player || !canine)
+    if (!world || !player)
         return;
 
     player->update(dt);
-    physics.updatePlayer(player, dt);
-
     canine->update(dt);
+
+    physics.updatePlayer(player, dt);
 
     updateCamera(dt);
 }

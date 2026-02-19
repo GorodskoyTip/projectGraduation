@@ -7,6 +7,7 @@
 #include <vector>
 
 class Player;
+class Canine;
 
 class GameScene : public ax::Scene
 {
@@ -18,6 +19,7 @@ public:
 
 private:
     Player* player = nullptr;
+    Canine* canine = nullptr;
     Node* world    = nullptr;
     PhysicsSystem physics;
 };

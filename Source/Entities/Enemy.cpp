@@ -35,18 +35,18 @@ void Enemy::handleMove(float dt) {}
 
 void Enemy::handleFall(float dt) {}
 
-void Enemy::handleDead(float dt) {}
+void Enemy::handleDeath(float dt) {}
 
 void Enemy::updateAI(float dt) {}
 
-ax::Animation* Enemy::createAnimation(const std::string prefix, float delay)
+ax::Animation* Enemy::createAnimation(const std::string& entity, const std::string& prefix, float delay)
 {
     Vector<SpriteFrame*> frames;
     int index = 1;
 
     while (true)
     {
-        std::string name   = prefix + "_" + std::to_string(index) + ".png";
+        std::string name   = entity + "_" + prefix + "_" + std::to_string(index) + ".png";
         SpriteFrame* frame = SpriteFrameCache::getInstance()->getSpriteFrameByName(name);
 
         if (frame == nullptr)
@@ -63,9 +63,11 @@ ax::Animation* Enemy::createAnimation(const std::string prefix, float delay)
     }
 
     auto animation = Animation::createWithSpriteFrames(frames, delay);
-    AnimationCache::getInstance()->addAnimation(animation, prefix);
+    animation->retain();
     return animation;
 }
+
+void Enemy::updateAnimation() {}
 
 void Enemy::update(float dt)
 {
@@ -83,9 +85,10 @@ void Enemy::update(float dt)
         handleFall(dt);
         break;
     case EnemyState::Dead:
-        handleDead(dt);
+        handleDeath(dt);
         break;
     }
+    updateAnimation();
 
     velocity.y += GRAVITY * dt;
 }
