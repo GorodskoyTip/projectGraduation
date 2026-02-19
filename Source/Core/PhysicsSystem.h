@@ -14,6 +14,8 @@ public:
     void updatePlayer(Player* player, float dt);
     void updateEnemy(Enemy* enemy, float dt);
 
+    const std::vector<Collider>& getColliders() const;
+
 private:
     std::vector<Collider> colliders;
 

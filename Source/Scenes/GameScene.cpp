@@ -30,7 +30,7 @@ bool GameScene::init()
     physics.addCollider({ax::Rect(0, 0, 3000, 100), ColliderType::Solid});
     physics.addCollider({ax::Rect(0, 0, 50, 1000), ColliderType::Solid});
     physics.addCollider({ax::Rect(2950, 0, 50, 1000), ColliderType::Solid});
-    physics.addCollider({ax::Rect(600, 150, 200, 20), ColliderType::OneWay});
+    physics.addCollider({ax::Rect(600, 150, 150, 20), ColliderType::OneWay});
 
     auto ground = ax::LayerColor::create(ax::Color4B::RED, 3000, 100);
     ground->setPosition(0, 0);
@@ -56,8 +56,34 @@ bool GameScene::init()
     canine->setPosition(400, 240);
     world->addChild(canine);
 
+    debugDraw = ax::DrawNode::create();
+    world->addChild(debugDraw, 999);
+
     scheduleUpdate();
     return true;
+}
+
+void GameScene::onEnter()
+{
+    Scene::onEnter();
+
+    auto listener = ax::EventListenerKeyboard::create();
+
+    listener->onKeyPressed = [this](ax::EventKeyboard::KeyCode keyCode, ax::Event*) {
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_F1)
+        {
+            debugPhysics = !debugPhysics;
+            AXLOG("Debug toggled: %d", debugPhysics);
+        }
+    };
+
+    _eventDispatcher->addEventListenerWithFixedPriority(listener, 1);
+}
+
+void GameScene::onExit()
+{
+    _eventDispatcher->removeEventListenersForTarget(this);
+    Scene::onExit();
 }
 
 void GameScene::updateCamera(float dt)
@@ -97,4 +123,39 @@ void GameScene::update(float dt)
     physics.updateEnemy(canine, dt);
 
     updateCamera(dt);
+
+    debugDraw->clear();
+    if (debugPhysics)
+    {
+
+        auto rect         = player->getPhysicsRect();
+        ax::Vec2 verts[4] = {{rect.getMinX(), rect.getMinY()},
+                             {rect.getMaxX(), rect.getMinY()},
+                             {rect.getMaxX(), rect.getMaxY()},
+                             {rect.getMinX(), rect.getMaxY()}};
+
+        debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 0, 1, 1)
+        );
+
+        auto erect         = canine->getPhysicsRect();
+        ax::Vec2 everts[4] = {{erect.getMinX(), erect.getMinY()},
+                              {erect.getMaxX(), erect.getMinY()},
+                              {erect.getMaxX(), erect.getMaxY()},
+                              {erect.getMinX(), erect.getMaxY()}};
+
+        debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 0, 1, 1)
+        );
+
+        for (const auto& col : physics.getColliders())
+        {
+            auto c = col.rect;
+
+            ax::Vec2 cverts[4] = {{c.getMinX(), c.getMinY()},
+                                  {c.getMaxX(), c.getMinY()},
+                                  {c.getMaxX(), c.getMaxY()},
+                                  {c.getMinX(), c.getMaxY()}};
+
+            debugDraw->drawPoly(cverts, 4, true, ax::Color4F(0, 0, 1, 1));
+        }
+    }
 }

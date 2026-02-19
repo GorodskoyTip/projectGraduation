@@ -17,9 +17,16 @@ public:
     virtual void update(float dt) override;
     void updateCamera(float dt);
 
+    void onKeyPressed(ax::EventKeyboard::KeyCode keyCode, ax::Event* event);
+    virtual void onEnter() override;
+    virtual void onExit() override;
+
+
 private:
     Player* player = nullptr;
     Canine* canine = nullptr;
     Node* world    = nullptr;
     PhysicsSystem physics;
+    bool debugPhysics = true;
+    ax::DrawNode* debugDraw = nullptr;
 };

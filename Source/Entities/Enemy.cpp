@@ -14,8 +14,8 @@ bool Enemy::initBase()
 
 ax::Rect Enemy::getPhysicsRect() const
 {
-    constexpr float W = 40;
-    constexpr float H = 80;
+    constexpr float W = 30;
+    constexpr float H = 30;
 
     auto pos = getPosition();
     return Rect(pos.x - W / 2, pos.y - H / 2, W, H);

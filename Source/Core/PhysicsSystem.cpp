@@ -3,6 +3,7 @@
 #include "Entities/Enemy.h"
 
 void PhysicsSystem::addCollider(const Collider& col) { colliders.push_back(col); }
+const std::vector<Collider>& PhysicsSystem::getColliders() const { return colliders; }
 
 void PhysicsSystem::playerMoveAndCollideX(Player* player, float dt)
 {

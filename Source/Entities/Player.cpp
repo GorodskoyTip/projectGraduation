@@ -96,11 +96,11 @@ void Player::onExit()
 
 ax::Rect Player::getPhysicsRect() const
 {
-    constexpr float PHYS_WIDTH  = 40.0f;
-    constexpr float PHYS_HEIGHT = 80.0f;
+    constexpr float PHYS_WIDTH  = 25.0f;
+    constexpr float PHYS_HEIGHT = 30.0f;
 
     auto pos = getPosition();
-    return ax::Rect(pos.x - PHYS_WIDTH / 2, pos.y - PHYS_HEIGHT / 2, PHYS_WIDTH, PHYS_HEIGHT);
+    return ax::Rect(pos.x - PHYS_WIDTH / 2, pos.y - PHYS_HEIGHT, PHYS_WIDTH, PHYS_HEIGHT);
 }
 
 void Player::setOnGround(bool value)
