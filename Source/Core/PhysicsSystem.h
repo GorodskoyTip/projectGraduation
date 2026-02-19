@@ -10,12 +10,15 @@ class PhysicsSystem
 {
 public:
     void addCollider(const Collider& col);
-    void updatePlayer(Player* player, float dt);
     bool hasGroundBelow(const ax::Vec2& point) const;
+    void updatePlayer(Player* player, float dt);
+    void updateEnemy(Enemy* enemy, float dt);
 
 private:
     std::vector<Collider> colliders;
 
-    void moveAndCollideX(Player* player, float dt);
-    void moveAndCollideY(Player* player, float dt);
+    void playerMoveAndCollideX(Player* player, float dt);
+    void playerMoveAndCollideY(Player* player, float dt);
+    void enemyMoveAndCollideX(Enemy* enemy, float dt);
+    void enemyMoveAndCollideY(Enemy* enemy, float dt);
 };

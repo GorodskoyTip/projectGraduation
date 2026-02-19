@@ -94,6 +94,7 @@ void GameScene::update(float dt)
     canine->update(dt);
 
     physics.updatePlayer(player, dt);
+    physics.updateEnemy(canine, dt);
 
     updateCamera(dt);
 }
