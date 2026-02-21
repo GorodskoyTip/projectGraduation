@@ -73,7 +73,12 @@ void GameScene::onEnter()
         if (keyCode == ax::EventKeyboard::KeyCode::KEY_F1)
         {
             debugPhysics = !debugPhysics;
-            AXLOG("Debug toggled: %d", debugPhysics);
+            AXLOG("Physics debug toggled: %d", debugPhysics);
+        }
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_F2)
+        {
+            debugHurtBox = !debugHurtBox;
+            AXLOG("Hurtbox debug toggled: %d", debugHurtBox);
         }
     };
 

@@ -35,6 +35,7 @@ public:
 
     float getHP();
 
+    ax::Rect getHurtBox() const;
     void receiveDamage(int amount);
 
 private:

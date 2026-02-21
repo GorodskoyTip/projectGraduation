@@ -23,10 +23,13 @@ public:
 
 
 private:
-    Player* player = nullptr;
-    Canine* canine = nullptr;
-    Node* world    = nullptr;
     PhysicsSystem physics;
-    bool debugPhysics = true;
+
+    Player* player          = nullptr;
+    Canine* canine          = nullptr;
+    Node* world             = nullptr;
+    bool debugPhysics       = true;
+    bool debugHurtBox       = true;
+    bool debugHitBox        = true;
     ax::DrawNode* debugDraw = nullptr;
 };
