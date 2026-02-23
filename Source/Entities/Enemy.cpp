@@ -48,6 +48,17 @@ void Enemy::handleDeath(float dt) {}
 
 void Enemy::updateAI(float dt) {}
 
+void Enemy::receiveDamage(float amount)
+{
+    if (!isInvincible && hp > 0)
+    {
+        hp                 = std::max(0.0f, hp - amount);
+        isInvincible       = true;
+        invincibilityTimer = 1;
+        AXLOG("Damage received by canine: %f", amount);
+    }
+}
+
 ax::Animation* Enemy::createAnimation(const std::string& entity, const std::string& prefix, float delay)
 {
     Vector<SpriteFrame*> frames;
@@ -98,6 +109,14 @@ void Enemy::update(float dt)
         break;
     }
     updateAnimation();
+
+    if (invincibilityTimer > 0)
+        invincibilityTimer -= dt;
+    else if (invincibilityTimer <= 0)
+    {
+        invincibilityTimer = 0;
+        isInvincible       = false;
+    }
 
     velocity.y += GRAVITY * dt;
 }

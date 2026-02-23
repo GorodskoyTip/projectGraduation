@@ -37,6 +37,7 @@ bool Player::init()
     runAnim  = createAnimation("run", 0.035f);
     jumpAnim = createAnimation("jump", 0.05f);
     fallAnim = createAnimation("fall", 0.05f);
+    attackAnim = createAnimation("lightAttackFirstHit", 0.05);
 
     if (!idleAnim || !runAnim || !jumpAnim || !fallAnim)
     {
@@ -66,6 +67,16 @@ void Player::onKeyPressed(EventKeyboard::KeyCode key, Event*)
 
             jumpFromRun = (state == PlayerState::Run);
             state = PlayerState::Jump;
+        }
+    }
+
+    if (key == EventKeyboard::KeyCode::KEY_J)
+    {
+        if (!attackActive)
+        {
+            attackActive = true;
+            attackTimer  = 0.5f;
+            state        = PlayerState::Attack;
         }
     }
 }
@@ -149,6 +160,9 @@ void Player::updateAnimation()
     case PlayerState::Fall:
         runAction(RepeatForever::create(Animate::create(fallAnim)));
         break;
+    case PlayerState::Attack:
+        runAction(Animate::create(attackAnim));
+        break;
     }
     currentAnimationState = state;
 }
@@ -184,6 +198,29 @@ ax::Animation* Player::createAnimation(const std::string& prefix, float delay)
 float Player::getHP()
 {
     return hp;
+}
+
+void Player::updateAttack(float dt)
+{
+
+    if (attackActive)
+    {
+        attackTimer -= dt;
+
+        float width  = 25.f;
+        float height = 30.f;
+
+        auto pos = getPosition();
+
+        float offsetX = facingRight ? -5.f : 30.f;
+
+        hitBox = ax::Rect(pos.x + offsetX - width, pos.y - height, width, height);
+
+        if (attackTimer <= 0.f)
+        {
+            attackActive = false;
+        }
+    }
 }
 
 void Player::receiveDamage(int amount)
@@ -274,6 +311,24 @@ void Player::handleAirMovement(float dt)
     }
 }
 
+void Player::handleAttack(float dt)
+{
+    if (onGround)
+    {
+        velocity.x = 0;
+    }
+
+    if (!attackActive)
+    {
+        if (!onGround)
+            state = PlayerState::Fall;
+        else if (moveLeft || moveRight)
+            state = PlayerState::Run;
+        else
+            state = PlayerState::Idle;
+    }
+}
+
 void Player::updateFacingDirection()
 {
     if (velocity.x < 0.0f && !facingRight)
@@ -306,9 +361,13 @@ void Player::update(float dt)
     case PlayerState::Fall:
         handleFall(dt);
         break;
+    case PlayerState::Attack:
+        handleAttack(dt);
     }
+
     updateFacingDirection();
     updateAnimation();
+    updateAttack(dt);
 
     if (invincibilityTimer > 0)
         invincibilityTimer -= dt;

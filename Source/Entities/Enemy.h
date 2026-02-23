@@ -35,6 +35,9 @@ public:
     void onDeath();
     bool isDead() const { return state == EnemyState::Dead; }
 
+    bool getIsInvincible() { return isInvincible; }
+    void setIsInvinsible(bool isInv) { isInvincible = isInv; }
+
 protected:
     ax::Vec2 velocity;
 
@@ -55,4 +58,6 @@ protected:
     virtual void handleFall(float dt);
     virtual void handleDeath(float dt);
 
+    bool isInvincible;
+    float invincibilityTimer;
 };

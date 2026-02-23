@@ -91,8 +91,78 @@ void GameScene::onExit()
     Scene::onExit();
 }
 
-void GameScene::updateCamera(float dt)
+void GameScene::drawDebug()
 {
+    debugDraw->clear();
+    if (debugPhysics)
+    {
+        auto playerPhysRect = player->getPhysicsRect();
+        ax::Vec2 verts[4]   = {{playerPhysRect.getMinX(), playerPhysRect.getMinY()},
+                               {playerPhysRect.getMaxX(), playerPhysRect.getMinY()},
+                               {playerPhysRect.getMaxX(), playerPhysRect.getMaxY()},
+                               {playerPhysRect.getMinX(), playerPhysRect.getMaxY()}};
+        debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 0, 1, 1));
+
+        auto enemyPhysRect = canine->getPhysicsRect();
+        ax::Vec2 everts[4] = {{enemyPhysRect.getMinX(), enemyPhysRect.getMinY()},
+                              {enemyPhysRect.getMaxX(), enemyPhysRect.getMinY()},
+                              {enemyPhysRect.getMaxX(), enemyPhysRect.getMaxY()},
+                              {enemyPhysRect.getMinX(), enemyPhysRect.getMaxY()}};
+        debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 0, 1, 1));
+
+        for (const auto& col : physics.getColliders())
+        {
+            auto c             = col.rect;
+            ax::Vec2 cverts[4] = {{c.getMinX(), c.getMinY()},
+                                  {c.getMaxX(), c.getMinY()},
+                                  {c.getMaxX(), c.getMaxY()},
+                                  {c.getMinX(), c.getMaxY()}};
+            debugDraw->drawPoly(cverts, 4, true, ax::Color4F(0, 0, 1, 1));
+        }
+    }
+    if (debugHurtBox)
+    {
+        auto playerHurtBox = player->getHurtBox();
+        ax::Vec2 verts[4]  = {{playerHurtBox.getMinX(), playerHurtBox.getMinY()},
+                              {playerHurtBox.getMaxX(), playerHurtBox.getMinY()},
+                              {playerHurtBox.getMaxX(), playerHurtBox.getMaxY()},
+                              {playerHurtBox.getMinX(), playerHurtBox.getMaxY()}};
+        debugDraw->drawPoly(verts, 4, true, ax::Color4F(1, 0, 0, 1));
+
+        auto enemyHurtBox  = canine->getHurtBox();
+        ax::Vec2 everts[4] = {{enemyHurtBox.getMinX(), enemyHurtBox.getMinY()},
+                              {enemyHurtBox.getMaxX(), enemyHurtBox.getMinY()},
+                              {enemyHurtBox.getMaxX(), enemyHurtBox.getMaxY()},
+                              {enemyHurtBox.getMinX(), enemyHurtBox.getMaxY()}};
+        debugDraw->drawPoly(everts, 4, true, ax::Color4F(1, 0, 0, 1));
+    }
+
+    auto playerHitBox = player->getHitBox();
+    ax::Vec2 verts[4] = {{playerHitBox.getMinX(), playerHitBox.getMinY()},
+                         {playerHitBox.getMaxX(), playerHitBox.getMinY()},
+                         {playerHitBox.getMaxX(), playerHitBox.getMaxY()},
+                         {playerHitBox.getMinX(), playerHitBox.getMaxY()}};
+    debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 1, 1, 1));
+}
+
+void GameScene::updatePlayerAttack(float dt)
+{
+    if (player->isAttackActive())
+    {
+        if (!canine->getIsInvincible() && player->getHitBox().intersectsRect(canine->getHurtBox()))
+        {
+            canine->receiveDamage(player->getAttackDamage());
+            canine->setIsInvinsible(true);
+        }
+    }
+    else
+    {
+        canine->setIsInvinsible(false);
+    }
+}
+
+void GameScene::updateCamera(float dt)
+    {
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
     float screenCenterX = visibleSize.width * 0.5f;
@@ -127,51 +197,9 @@ void GameScene::update(float dt)
     physics.updatePlayer(player, dt);
     physics.updateEnemy(canine, dt);
 
+    updatePlayerAttack(dt);
+
     updateCamera(dt);
 
-    debugDraw->clear();
-    if (debugPhysics)
-    {
-        auto playerPhysRect         = player->getPhysicsRect();
-        ax::Vec2 verts[4] = {{playerPhysRect.getMinX(), playerPhysRect.getMinY()},
-                             {playerPhysRect.getMaxX(), playerPhysRect.getMinY()},
-                             {playerPhysRect.getMaxX(), playerPhysRect.getMaxY()},
-                             {playerPhysRect.getMinX(), playerPhysRect.getMaxY()}};
-        debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 0, 1, 1)
-        );
-
-        auto enemyPhysRect         = canine->getPhysicsRect();
-        ax::Vec2 everts[4] = {{enemyPhysRect.getMinX(), enemyPhysRect.getMinY()},
-                              {enemyPhysRect.getMaxX(), enemyPhysRect.getMinY()},
-                              {enemyPhysRect.getMaxX(), enemyPhysRect.getMaxY()},
-                              {enemyPhysRect.getMinX(), enemyPhysRect.getMaxY()}};
-        debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 0, 1, 1)
-        );
-
-        for (const auto& col : physics.getColliders())
-        {
-            auto c = col.rect;
-            ax::Vec2 cverts[4] = {{c.getMinX(), c.getMinY()},
-                                  {c.getMaxX(), c.getMinY()},
-                                  {c.getMaxX(), c.getMaxY()},
-                                  {c.getMinX(), c.getMaxY()}};
-            debugDraw->drawPoly(cverts, 4, true, ax::Color4F(0, 0, 1, 1));
-        }
-    }
-    if (debugHurtBox)
-    {
-        auto playerHurtBox = player->getHurtBox();
-        ax::Vec2 verts[4]  = {{playerHurtBox.getMinX(), playerHurtBox.getMinY()},
-                              {playerHurtBox.getMaxX(), playerHurtBox.getMinY()},
-                              {playerHurtBox.getMaxX(), playerHurtBox.getMaxY()},
-                              {playerHurtBox.getMinX(), playerHurtBox.getMaxY()}};
-        debugDraw->drawPoly(verts, 4, true, ax::Color4F(1, 0, 0, 1));
-
-        auto enemyHurtBox = canine->getHurtBox();
-        ax::Vec2 everts[4] = {{enemyHurtBox.getMinX(), enemyHurtBox.getMinY()},
-                             {enemyHurtBox.getMaxX(), enemyHurtBox.getMinY()},
-                             {enemyHurtBox.getMaxX(), enemyHurtBox.getMaxY()},
-                             {enemyHurtBox.getMinX(), enemyHurtBox.getMaxY()}};
-        debugDraw->drawPoly(everts, 4, true, ax::Color4F(1, 0, 0, 1));
-    }
+    drawDebug();
 }

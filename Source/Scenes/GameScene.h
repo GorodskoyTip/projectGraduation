@@ -21,6 +21,10 @@ public:
     virtual void onEnter() override;
     virtual void onExit() override;
 
+    void drawDebug();
+
+    void updatePlayerAttack(float dt);
+    void updateEnemyAttack(float dt);
 
 private:
     PhysicsSystem physics;
