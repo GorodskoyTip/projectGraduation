@@ -196,6 +196,15 @@ void Player::receiveDamage(int amount)
     }
 }
 
+ax::Rect Player::getHurtBox() const
+{
+    constexpr float HURT_WIDTH  = 25.0f;
+    constexpr float HURT_HEIGHT = 30.0f;
+
+    auto pos = getPosition();
+    return ax::Rect(pos.x - HURT_WIDTH / 2, pos.y - HURT_HEIGHT, HURT_WIDTH, HURT_HEIGHT);
+}
+
 void Player::handleIdle(float dt)
 {
     velocity.x = 0;

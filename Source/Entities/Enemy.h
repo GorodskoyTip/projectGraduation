@@ -30,6 +30,7 @@ public:
     ax::Animation* createAnimation(const std::string& entity, const std::string& prefix, float delay);
     virtual void updateAnimation();
 
+    ax::Rect getHurtBox() const;
     void receiveDamage(float amount);
     void onDeath();
     bool isDead() const { return state == EnemyState::Dead; }

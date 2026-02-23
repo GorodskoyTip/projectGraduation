@@ -21,6 +21,15 @@ ax::Rect Enemy::getPhysicsRect() const
     return Rect(pos.x - W / 2, pos.y - H / 2, W, H);
 }
 
+ax::Rect Enemy::getHurtBox() const
+{
+    constexpr float W = 30;
+    constexpr float H = 30;
+
+    auto pos = getPosition();
+    return Rect(pos.x - W / 2, pos.y - H / 2, W, H);
+}
+
 ax::Vec2 Enemy::getVelocity() {return velocity;}
 
 void Enemy::setOnGround(bool value) {onGround = value;}

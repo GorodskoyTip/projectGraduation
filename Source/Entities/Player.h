@@ -38,6 +38,8 @@ public:
     ax::Rect getHurtBox() const;
     void receiveDamage(int amount);
 
+    ax::Rect getHitBox() const;
+
 private:
     PlayerState state = PlayerState::Idle;
     bool jumpFromRun  = false;
