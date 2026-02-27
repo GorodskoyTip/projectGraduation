@@ -85,7 +85,7 @@ void Canine::updateAnimation()
         runAction(RepeatForever::create(Animate::create(fallAnim)));
         break;
     case EnemyState::Dead:
-        runAction(RepeatForever::create(Animate::create(deathAnim)));
+        runAction(Animate::create(deathAnim));
         break;
     }
 

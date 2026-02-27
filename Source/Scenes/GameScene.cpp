@@ -137,12 +137,12 @@ void GameScene::drawDebug()
         debugDraw->drawPoly(everts, 4, true, ax::Color4F(1, 0, 0, 1));
     }
 
-    auto playerHitBox = player->getHitBox();
-    ax::Vec2 verts[4] = {{playerHitBox.getMinX(), playerHitBox.getMinY()},
-                         {playerHitBox.getMaxX(), playerHitBox.getMinY()},
-                         {playerHitBox.getMaxX(), playerHitBox.getMaxY()},
-                         {playerHitBox.getMinX(), playerHitBox.getMaxY()}};
-    debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 1, 1, 1));
+    //auto playerHitBox = player->getHitBox();
+    //ax::Vec2 verts[4] = {{playerHitBox.getMinX(), playerHitBox.getMinY()},
+    //                     {playerHitBox.getMaxX(), playerHitBox.getMinY()},
+    //                     {playerHitBox.getMaxX(), playerHitBox.getMaxY()},
+    //                     {playerHitBox.getMinX(), playerHitBox.getMaxY()}};
+    //debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 1, 1, 1));
 }
 
 void GameScene::updatePlayerAttack(float dt)

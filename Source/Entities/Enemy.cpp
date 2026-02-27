@@ -57,6 +57,13 @@ void Enemy::receiveDamage(float amount)
         invincibilityTimer = 1;
         AXLOG("Damage received by canine: %f", amount);
     }
+    if (hp <= 0)
+        onDeath();
+}
+
+void Enemy::onDeath()
+{
+    state = EnemyState::Dead;
 }
 
 ax::Animation* Enemy::createAnimation(const std::string& entity, const std::string& prefix, float delay)
