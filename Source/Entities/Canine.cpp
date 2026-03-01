@@ -30,12 +30,13 @@ bool Canine::init()
         return false;
     }
 
-    idleAnim = createAnimation("wolfBlack", "idle", 0.1f);
-    runAnim  = createAnimation("wolfBlack", "run", 0.035f);
-    fallAnim = createAnimation("wolfBlack", "idle", 0.1f);
+    idleAnim  = createAnimation("wolfBlack", "idle", 0.1f);
+    runAnim   = createAnimation("wolfBlack", "run", 0.035f);
+    fallAnim  = createAnimation("wolfBlack", "idle", 0.1f);
+    hitAnim   = createAnimation("wolfBlack", "hit", 0.035);
     deathAnim = createAnimation("wolfBlack", "death", 0.035f);
 
-    if (!idleAnim || !runAnim || !fallAnim || !deathAnim)
+    if (!idleAnim || !runAnim || !fallAnim || !hitAnim || !deathAnim)
     {
         AXLOG("ANIMATION CREATION FAILED");
         return false;
@@ -62,6 +63,20 @@ void Canine::handleMove(float dt) {
 
 void Canine::handleFall(float dt) {}
 
+void Canine::handleHit(float dt)
+{
+    if (onGround)
+        velocity.x = 0;
+
+    if (!isInvincible)
+    {
+        if (!onGround)
+            state = EnemyState::Fall;
+        else
+            state = EnemyState::Idle;
+    }
+}
+
 void Canine::handleDeath(float dt) {}
 
 void Canine::updateAI(float dt) {}
@@ -83,6 +98,9 @@ void Canine::updateAnimation()
         break;
     case EnemyState::Fall:
         runAction(RepeatForever::create(Animate::create(fallAnim)));
+        break;
+    case EnemyState::Hit:
+        runAction(Animate::create(hitAnim));
         break;
     case EnemyState::Dead:
         runAction(Animate::create(deathAnim));

@@ -44,6 +44,8 @@ void Enemy::handleMove(float dt) {}
 
 void Enemy::handleFall(float dt) {}
 
+void Enemy::handleHit(float dt) {}
+
 void Enemy::handleDeath(float dt) {}
 
 void Enemy::updateAI(float dt) {}
@@ -55,6 +57,7 @@ void Enemy::receiveDamage(float amount)
         hp                 = std::max(0.0f, hp - amount);
         isInvincible       = true;
         invincibilityTimer = 1;
+        state = EnemyState::Hit;
         AXLOG("Damage received by canine: %f", amount);
     }
     if (hp <= 0)
@@ -110,6 +113,9 @@ void Enemy::update(float dt)
         break;
     case EnemyState::Fall:
         handleFall(dt);
+        break;
+    case EnemyState::Hit:
+        handleHit(dt);
         break;
     case EnemyState::Dead:
         handleDeath(dt);

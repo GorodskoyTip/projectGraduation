@@ -6,6 +6,7 @@ enum class EnemyState
     Idle,
     Move,
     Fall,
+    Hit,
     Dead
 };
 
@@ -56,6 +57,7 @@ protected:
     virtual void handleIdle(float dt);
     virtual void handleMove(float dt);
     virtual void handleFall(float dt);
+    virtual void handleHit(float dt);
     virtual void handleDeath(float dt);
 
     bool isInvincible;

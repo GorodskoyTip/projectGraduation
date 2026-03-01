@@ -207,14 +207,14 @@ void Player::updateAttack(float dt)
     {
         attackTimer -= dt;
 
-        float width  = 25.f;
+        float width  = 40.f;
         float height = 30.f;
 
         auto pos = getPosition();
 
-        float offsetX = facingRight ? -5.f : 30.f;
+        float offsetX = facingRight ? -20.f : 30.f;
 
-        hitBox = ax::Rect(pos.x + offsetX - width, pos.y - height, width, height);
+        hitBox = ax::Rect(pos.x + offsetX - width/1.5, pos.y - height, width, height);
 
         if (attackTimer <= 0.f)
         {
@@ -314,9 +314,7 @@ void Player::handleAirMovement(float dt)
 void Player::handleAttack(float dt)
 {
     if (onGround)
-    {
         velocity.x = 0;
-    }
 
     if (!attackActive)
     {
