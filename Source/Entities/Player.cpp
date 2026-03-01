@@ -37,9 +37,11 @@ bool Player::init()
     runAnim  = createAnimation("run", 0.035f);
     jumpAnim = createAnimation("jump", 0.05f);
     fallAnim = createAnimation("fall", 0.05f);
-    attackAnim = createAnimation("lightAttackFirstHit", 0.05);
+    lightAttack1Anim = createAnimation("lightAttackFirstHit", 0.07);
+    lightAttack2Anim = createAnimation("lightAttackSecondHit", 0.07);
+    lightAttack3Anim = createAnimation("lightAttackThirdHit", 0.07);
 
-    if (!idleAnim || !runAnim || !jumpAnim || !fallAnim)
+    if (!idleAnim || !runAnim || !jumpAnim || !fallAnim || !lightAttack1Anim || !lightAttack2Anim || !lightAttack3Anim)
     {
         AXLOG("ANIMATION CREATION FAILED");
         return false;
@@ -66,17 +68,20 @@ void Player::onKeyPressed(EventKeyboard::KeyCode key, Event*)
             onGround   = false;
 
             jumpFromRun = (state == PlayerState::Run);
-            state = PlayerState::Jump;
+            state       = PlayerState::Jump;
         }
     }
 
     if (key == EventKeyboard::KeyCode::KEY_J)
     {
-        if (!attackActive)
+        if (!attackButtonHeld)
         {
-            attackActive = true;
-            attackTimer  = 0.5f;
-            state        = PlayerState::Attack;
+            attackButtonHeld = true;
+
+            if (state != PlayerState::Attack)
+                startAttack(0);
+            else
+                comboQueued = true;
         }
     }
 }
@@ -85,6 +90,7 @@ void Player::onKeyReleased(EventKeyboard::KeyCode key, Event*)
 {
     if (key == EventKeyboard::KeyCode::KEY_A) moveLeft = false;
     if (key == EventKeyboard::KeyCode::KEY_D) moveRight = false;
+    if (key == EventKeyboard::KeyCode::KEY_J) attackButtonHeld = false;
 }
 
 void Player::onEnter()
@@ -141,7 +147,7 @@ void Player::setVelocityY(float y)
 
 void Player::updateAnimation()
 {
-    if (state == currentAnimationState)
+    if (state == currentAnimationState && lastComboIndex == comboIndex)
         return;
 
     stopAllActions();
@@ -161,10 +167,20 @@ void Player::updateAnimation()
         runAction(RepeatForever::create(Animate::create(fallAnim)));
         break;
     case PlayerState::Attack:
-        runAction(Animate::create(attackAnim));
+        ax::Animation* anim = nullptr;
+
+        if (comboIndex == 0)
+            anim = lightAttack1Anim;
+        else if (comboIndex == 1)
+            anim = lightAttack2Anim;
+        else if (comboIndex == 2)
+            anim = lightAttack3Anim;
+        if (anim)
+            runAction(Animate::create(anim));
         break;
     }
     currentAnimationState = state;
+    lastComboIndex        = comboIndex;
 }
 
 ax::Animation* Player::createAnimation(const std::string& prefix, float delay)
@@ -198,6 +214,15 @@ ax::Animation* Player::createAnimation(const std::string& prefix, float delay)
 float Player::getHP()
 {
     return hp;
+}
+
+void Player::startAttack(int index)
+{
+    comboIndex       = index;
+    state            = PlayerState::Attack;
+    attackActive     = true;
+    attackTimer      = 0.8f;
+    comboWindowTimer = 0.5f;
 }
 
 void Player::updateAttack(float dt)
@@ -316,14 +341,48 @@ void Player::handleAttack(float dt)
     if (onGround)
         velocity.x = 0;
 
-    if (!attackActive)
+    // Если идёт сама атака
+    if (!inRecovery)
     {
-        if (!onGround)
-            state = PlayerState::Fall;
-        else if (moveLeft || moveRight)
-            state = PlayerState::Run;
-        else
-            state = PlayerState::Idle;
+        attackTimer -= dt;
+        comboWindowTimer -= dt;
+
+        // Атака закончилась
+        if (attackTimer <= 0.f)
+        {
+            attackActive = false;
+
+            // Если в очереди следующая атака
+            if (comboQueued && comboIndex < 2)
+            {
+                comboQueued = false;
+                startAttack(comboIndex + 1);
+                return;
+            }
+
+            // Иначе — уходим в recovery
+            inRecovery    = true;
+            recoveryTimer = 0.25f;  // ← вот твоя "пауза в последнем кадре"
+        }
+    }
+    else
+    {
+        // Стадия восстановления
+        recoveryTimer -= dt;
+
+        if (recoveryTimer <= 0.f)
+        {
+            inRecovery  = false;
+            comboQueued = false;
+            comboIndex  = 0;
+
+            if (!onGround)
+                state = PlayerState::Fall;
+            else if (moveLeft || moveRight)
+                state = PlayerState::Run;
+            else
+                state = PlayerState::Idle;
+        }
     }
 }
 
@@ -361,6 +420,7 @@ void Player::update(float dt)
         break;
     case PlayerState::Attack:
         handleAttack(dt);
+        break;
     }
 
     updateFacingDirection();

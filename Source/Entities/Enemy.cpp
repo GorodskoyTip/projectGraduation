@@ -56,7 +56,7 @@ void Enemy::receiveDamage(float amount)
     {
         hp                 = std::max(0.0f, hp - amount);
         isInvincible       = true;
-        invincibilityTimer = 1;
+        invincibilityTimer = 0.725;
         state = EnemyState::Hit;
         AXLOG("Damage received by canine: %f", amount);
     }

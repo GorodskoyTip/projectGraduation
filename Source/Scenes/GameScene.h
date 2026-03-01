@@ -32,8 +32,8 @@ private:
     Player* player          = nullptr;
     Canine* canine          = nullptr;
     Node* world             = nullptr;
-    bool debugPhysics       = true;
-    bool debugHurtBox       = true;
-    bool debugHitBox        = true;
+    bool debugPhysics       = false;
+    bool debugHurtBox       = false;
+    bool debugHitBox        = false;
     ax::DrawNode* debugDraw = nullptr;
 };

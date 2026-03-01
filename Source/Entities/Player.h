@@ -66,7 +66,9 @@ private:
     ax::Animation* runAnim;
     ax::Animation* jumpAnim;
     ax::Animation* fallAnim;
-    ax::Animation* attackAnim;
+    ax::Animation* lightAttack1Anim;
+    ax::Animation* lightAttack2Anim;
+    ax::Animation* lightAttack3Anim;
     PlayerState currentAnimationState = PlayerState::Idle;
 
     float hp = 100;
@@ -75,7 +77,16 @@ private:
     bool isInvincible;
 
     ax::Rect hitBox;
-    bool attackActive = false;
-    float attackTimer = 0.f;
-    int attackDamage  = 10;
+    bool attackButtonHeld = false;
+    bool attackActive     = false;
+    float attackTimer     = 0.f;
+    int attackDamage      = 10;
+
+    int comboIndex         = 0;
+    int lastComboIndex     = -1;
+    bool comboQueued       = false;
+    float comboWindowTimer = 0.f;
+    void startAttack(int index);
+    float recoveryTimer = 0.f;
+    bool inRecovery      = false;
 };
