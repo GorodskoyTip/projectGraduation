@@ -50,16 +50,21 @@ void Enemy::handleDeath(float dt) {}
 
 void Enemy::updateAI(float dt) {}
 
-void Enemy::receiveDamage(float amount)
+void Enemy::receiveDamage(float amount, int attackID)
 {
-    if (!isInvincible && hp > 0)
-    {
-        hp                 = std::max(0.0f, hp - amount);
-        isInvincible       = true;
-        invincibilityTimer = 0.725;
-        state = EnemyState::Hit;
-        AXLOG("Damage received by canine: %f", amount);
-    }
+    if (lastReceivedAttackID == attackID)
+        return;
+
+    lastReceivedAttackID = attackID;
+
+    hp = std::max(0.0f, hp - amount);
+    state = EnemyState::Hit;
+    hitTimer = 0.5;
+
+    stopAllActions();
+
+    AXLOG("Damage received: %f", amount);
+
     if (hp <= 0)
         onDeath();
 }
@@ -122,14 +127,6 @@ void Enemy::update(float dt)
         break;
     }
     updateAnimation();
-
-    if (invincibilityTimer > 0)
-        invincibilityTimer -= dt;
-    else if (invincibilityTimer <= 0)
-    {
-        invincibilityTimer = 0;
-        isInvincible       = false;
-    }
 
     velocity.y += GRAVITY * dt;
 }

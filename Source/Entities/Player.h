@@ -44,6 +44,8 @@ public:
     bool isAttackActive() { return attackActive; }
     int getAttackDamage() { return attackDamage; }
 
+    int getAttackID() const { return attackID; }
+
 private:
     PlayerState state = PlayerState::Idle;
     bool jumpFromRun  = false;
@@ -89,4 +91,6 @@ private:
     void startAttack(int index);
     float recoveryTimer = 0.f;
     bool inRecovery      = false;
+
+    int attackID = 0;
 };

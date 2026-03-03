@@ -68,7 +68,9 @@ void Canine::handleHit(float dt)
     if (onGround)
         velocity.x = 0;
 
-    if (!isInvincible)
+    hitTimer -= dt;
+
+    if (hitTimer <= 0.0f)
     {
         if (!onGround)
             state = EnemyState::Fall;
@@ -83,7 +85,7 @@ void Canine::updateAI(float dt) {}
 
 void Canine::updateAnimation()
 {
-    if (state == currentAnimationState)
+    if (state == currentAnimationState && state != EnemyState::Hit)
         return;
 
     stopAllActions();

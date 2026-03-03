@@ -32,12 +32,9 @@ public:
     virtual void updateAnimation();
 
     ax::Rect getHurtBox() const;
-    void receiveDamage(float amount);
+    void receiveDamage(float amount, int attackID);
     void onDeath();
     bool isDead() const { return state == EnemyState::Dead; }
-
-    bool getIsInvincible() { return isInvincible; }
-    void setIsInvinsible(bool isInv) { isInvincible = isInv; }
 
 protected:
     ax::Vec2 velocity;
@@ -60,6 +57,6 @@ protected:
     virtual void handleHit(float dt);
     virtual void handleDeath(float dt);
 
-    bool isInvincible;
-    float invincibilityTimer;
+    float hitTimer           = 0.0f;
+    int lastReceivedAttackID = -1;
 };

@@ -37,9 +37,9 @@ bool Player::init()
     runAnim  = createAnimation("run", 0.035f);
     jumpAnim = createAnimation("jump", 0.05f);
     fallAnim = createAnimation("fall", 0.05f);
-    lightAttack1Anim = createAnimation("lightAttackFirstHit", 0.07);
-    lightAttack2Anim = createAnimation("lightAttackSecondHit", 0.07);
-    lightAttack3Anim = createAnimation("lightAttackThirdHit", 0.07);
+    lightAttack1Anim = createAnimation("lightAttackFirstHit", 0.05);
+    lightAttack2Anim = createAnimation("lightAttackSecondHit", 0.05);
+    lightAttack3Anim = createAnimation("lightAttackThirdHit", 0.05);
 
     if (!idleAnim || !runAnim || !jumpAnim || !fallAnim || !lightAttack1Anim || !lightAttack2Anim || !lightAttack3Anim)
     {
@@ -218,10 +218,12 @@ float Player::getHP()
 
 void Player::startAttack(int index)
 {
+    attackID++;
+
     comboIndex       = index;
     state            = PlayerState::Attack;
     attackActive     = true;
-    attackTimer      = 0.8f;
+    attackTimer      = 0.4f;
     comboWindowTimer = 0.5f;
 }
 
@@ -230,8 +232,6 @@ void Player::updateAttack(float dt)
 
     if (attackActive)
     {
-        attackTimer -= dt;
-
         float width  = 40.f;
         float height = 30.f;
 

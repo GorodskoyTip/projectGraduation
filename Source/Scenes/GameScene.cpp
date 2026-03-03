@@ -147,17 +147,12 @@ void GameScene::drawDebug()
 
 void GameScene::updatePlayerAttack(float dt)
 {
-    if (player->isAttackActive())
+    if (!player->isAttackActive())
+        return;
+
+    if (player->getHitBox().intersectsRect(canine->getHurtBox()))
     {
-        if (!canine->getIsInvincible() && player->getHitBox().intersectsRect(canine->getHurtBox()))
-        {
-            canine->receiveDamage(player->getAttackDamage());
-            canine->setIsInvinsible(true);
-        }
-    }
-    else
-    {
-        canine->setIsInvinsible(false);
+        canine->receiveDamage(player->getAttackDamage(), player->getAttackID());
     }
 }
 

@@ -1,0 +1,1 @@
+- Fix Enemy ReceiveDamage to receive damage only once per hit
