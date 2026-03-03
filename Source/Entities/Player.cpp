@@ -224,7 +224,6 @@ void Player::startAttack(int index)
     state            = PlayerState::Attack;
     attackActive     = true;
     attackTimer      = 0.4f;
-    comboWindowTimer = 0.5f;
 }
 
 void Player::updateAttack(float dt)
@@ -345,7 +344,6 @@ void Player::handleAttack(float dt)
     if (!inRecovery)
     {
         attackTimer -= dt;
-        comboWindowTimer -= dt;
 
         // Атака закончилась
         if (attackTimer <= 0.f)
@@ -367,12 +365,19 @@ void Player::handleAttack(float dt)
     }
     else
     {
-        // Стадия восстановления
+        if (comboQueued && comboIndex < 2)
+        {
+            comboQueued = false;
+            inRecovery  = false;
+            startAttack(comboIndex + 1);
+            return;
+        }
+
         recoveryTimer -= dt;
 
-        if (recoveryTimer <= 0.f)
+        if (recoveryTimer <= 0.0f)
         {
-            inRecovery  = false;
+            inRecovery = false;
             comboQueued = false;
             comboIndex  = 0;
 

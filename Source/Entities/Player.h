@@ -87,7 +87,6 @@ private:
     int comboIndex         = 0;
     int lastComboIndex     = -1;
     bool comboQueued       = false;
-    float comboWindowTimer = 0.f;
     void startAttack(int index);
     float recoveryTimer = 0.f;
     bool inRecovery      = false;
