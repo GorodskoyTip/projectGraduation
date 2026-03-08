@@ -119,7 +119,7 @@ void Canine::updateAttack(float dt)
 {
     if (attackActive)
     {
-        float width  = 20.0f;
+        float width  = 10.0f;
         float height = 15.0f;
 
         auto pos = getPosition();

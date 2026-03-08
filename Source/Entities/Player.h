@@ -8,7 +8,9 @@ enum class PlayerState
     Run,
     Jump,
     Fall,
-    Attack
+    Attack,
+    Hit,
+    Dead
 };
 
 class Player : public ax::Sprite
@@ -38,6 +40,7 @@ public:
 
     ax::Rect getHurtBox() const;
     void receiveDamage(float amount);
+    void onDeath();
 
     void updateAttack(float dt);
     ax::Rect getHitBox() { return hitBox; }
@@ -61,6 +64,8 @@ private:
     void handleFall(float dt);
     void handleAirMovement(float dt);
     void handleAttack(float dt);
+    void handleHit(float dt);
+    void handleDead(float dt);
 
     bool facingRight = true;
     void updateFacingDirection();
@@ -71,12 +76,15 @@ private:
     ax::Animation* lightAttack1Anim;
     ax::Animation* lightAttack2Anim;
     ax::Animation* lightAttack3Anim;
+    ax::Animation* hitAnim;
+    ax::Animation* deathAnim;
     PlayerState currentAnimationState = PlayerState::Idle;
 
     float hp = 100;
 
     float invincibilityTimer;
     bool isInvincible;
+    float hitTimer = 0.0f;
 
     ax::Rect hitBox;
     bool attackButtonHeld = false;

@@ -40,6 +40,8 @@ bool Player::init()
     lightAttack1Anim = createAnimation("lightAttackFirstHit", 0.05);
     lightAttack2Anim = createAnimation("lightAttackSecondHit", 0.05);
     lightAttack3Anim = createAnimation("lightAttackThirdHit", 0.05);
+    hitAnim = createAnimation("damageReceived", 0.1);
+    deathAnim = createAnimation("dead", 0.05);
 
     if (!idleAnim || !runAnim || !jumpAnim || !fallAnim || !lightAttack1Anim || !lightAttack2Anim || !lightAttack3Anim)
     {
@@ -55,6 +57,9 @@ bool Player::init()
 
 void Player::onKeyPressed(EventKeyboard::KeyCode key, Event*)
 {
+    if (state == PlayerState::Hit || state == PlayerState::Dead)
+        return;
+
     if (key == EventKeyboard::KeyCode::KEY_A)
         moveLeft = true;
     if (key == EventKeyboard::KeyCode::KEY_D)
@@ -166,6 +171,12 @@ void Player::updateAnimation()
     case PlayerState::Fall:
         runAction(RepeatForever::create(Animate::create(fallAnim)));
         break;
+    case PlayerState::Hit:
+        runAction(Animate::create(hitAnim));
+        break;
+    case PlayerState::Dead:
+        runAction(Animate::create(deathAnim));
+        break;
     case PlayerState::Attack:
         ax::Animation* anim = nullptr;
 
@@ -248,13 +259,30 @@ void Player::updateAttack(float dt)
 
 void Player::receiveDamage(float amount)
 {
-    if (!isInvincible && hp > 0)
-    {
-        hp = std::max(0.0f, hp-amount);
-        isInvincible = true;
-        invincibilityTimer = 1;
-        AXLOG("Damage received: %f", amount);
-    }
+    if (isInvincible)
+        return;
+
+    hp                 = std::max(0.0f, hp - amount);
+    state              = PlayerState::Hit;
+    hitTimer           = 0.5;
+    isInvincible       = true;
+    invincibilityTimer = 1;
+
+    attackActive = false;
+    comboQueued  = false;
+    inRecovery   = false;
+
+    stopAllActions();
+
+    AXLOG("Damage received: %f", amount);
+
+    if (hp <= 0)
+        onDeath();
+}
+
+void Player::onDeath()
+{
+    state = PlayerState::Dead;
 }
 
 ax::Rect Player::getHurtBox() const
@@ -391,6 +419,29 @@ void Player::handleAttack(float dt)
     }
 }
 
+void Player::handleHit(float dt)
+{
+    if (onGround)
+        velocity.x = 0;
+
+    hitTimer -= dt;
+
+    if (hitTimer <= 0)
+    {
+        if (!onGround)
+            state = PlayerState::Fall;
+        else if (moveLeft || moveRight)
+            state = PlayerState::Run;
+        else
+            state = PlayerState::Idle;
+    }
+}
+
+void Player::handleDead(float dt)
+{
+    velocity.x = 0; 
+}
+
 void Player::updateFacingDirection()
 {
     if (velocity.x < 0.0f && !facingRight)
@@ -425,6 +476,12 @@ void Player::update(float dt)
         break;
     case PlayerState::Attack:
         handleAttack(dt);
+        break;
+    case PlayerState::Hit:
+        handleHit(dt);
+        break;
+    case PlayerState::Dead:
+        handleDead(dt);
         break;
     }
 
