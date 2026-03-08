@@ -6,6 +6,7 @@ enum class EnemyState
     Idle,
     Move,
     Fall,
+    Attack,
     Hit,
     Dead
 };
@@ -36,6 +37,12 @@ public:
     void onDeath();
     bool isDead() const { return state == EnemyState::Dead; }
 
+    virtual void updateAttack(float dt);
+    ax::Rect getHitBox() { return hitBox; }
+    bool isAttackActive() { return attackActive; }
+    float getAttackDamage() { return attackDamage; }
+    virtual void startAttack();
+
 protected:
     ax::Vec2 velocity;
 
@@ -54,9 +61,18 @@ protected:
     virtual void handleIdle(float dt);
     virtual void handleMove(float dt);
     virtual void handleFall(float dt);
+    virtual void handleAttack(float dt);
     virtual void handleHit(float dt);
     virtual void handleDeath(float dt);
 
     float hitTimer           = 0.0f;
     int lastReceivedAttackID = -1;
+
+    ax::Rect hitBox;
+    bool attackActive = false;
+    float attackTimer = 0.0f;
+    float attackCooldown = 0.0f;
+    float attackDuration = 0.0f;
+
+    int attackDamage;
 };

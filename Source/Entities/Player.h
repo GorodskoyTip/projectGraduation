@@ -37,7 +37,7 @@ public:
     float getHP();
 
     ax::Rect getHurtBox() const;
-    void receiveDamage(int amount);
+    void receiveDamage(float amount);
 
     void updateAttack(float dt);
     ax::Rect getHitBox() { return hitBox; }

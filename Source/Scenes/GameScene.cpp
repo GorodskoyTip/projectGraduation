@@ -80,6 +80,11 @@ void GameScene::onEnter()
             debugHurtBox = !debugHurtBox;
             AXLOG("Hurtbox debug toggled: %d", debugHurtBox);
         }
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_F3)
+        {
+            debugHitBox = !debugHitBox;
+            AXLOG("Hitbox debug toggled: %d", debugHitBox);
+        }
     };
 
     _eventDispatcher->addEventListenerWithFixedPriority(listener, 1);
@@ -136,13 +141,22 @@ void GameScene::drawDebug()
                               {enemyHurtBox.getMinX(), enemyHurtBox.getMaxY()}};
         debugDraw->drawPoly(everts, 4, true, ax::Color4F(1, 0, 0, 1));
     }
+    if (debugHitBox)
+    {
+        auto playerHitBox = player->getHitBox();
+        ax::Vec2 verts[4] = {{playerHitBox.getMinX(), playerHitBox.getMinY()},
+                             {playerHitBox.getMaxX(), playerHitBox.getMinY()},
+                             {playerHitBox.getMaxX(), playerHitBox.getMaxY()},
+                             {playerHitBox.getMinX(), playerHitBox.getMaxY()}};
+        debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 1, 1, 1));
 
-    //auto playerHitBox = player->getHitBox();
-    //ax::Vec2 verts[4] = {{playerHitBox.getMinX(), playerHitBox.getMinY()},
-    //                     {playerHitBox.getMaxX(), playerHitBox.getMinY()},
-    //                     {playerHitBox.getMaxX(), playerHitBox.getMaxY()},
-    //                     {playerHitBox.getMinX(), playerHitBox.getMaxY()}};
-    //debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 1, 1, 1));
+        auto enemyHitBox = canine->getHitBox();
+        ax::Vec2 everts[4] = {{enemyHitBox.getMinX(), enemyHitBox.getMinY()},
+                             {enemyHitBox.getMaxX(), enemyHitBox.getMinY()},
+                             {enemyHitBox.getMaxX(), enemyHitBox.getMaxY()},
+                             {enemyHitBox.getMinX(), enemyHitBox.getMaxY()}};
+        debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 1, 1, 1));
+    }
 }
 
 void GameScene::updatePlayerAttack(float dt)
@@ -153,6 +167,17 @@ void GameScene::updatePlayerAttack(float dt)
     if (player->getHitBox().intersectsRect(canine->getHurtBox()))
     {
         canine->receiveDamage(player->getAttackDamage(), player->getAttackID());
+    }
+}
+
+void GameScene::updateEnemyAttack(float dt)
+{
+    if (canine->isAttackActive())
+    {
+        if (canine->getHitBox().intersectsRect(player->getHurtBox()))
+        {
+            player->receiveDamage(canine->getAttackDamage());
+        }
     }
 }
 
@@ -193,6 +218,7 @@ void GameScene::update(float dt)
     physics.updateEnemy(canine, dt);
 
     updatePlayerAttack(dt);
+    updateEnemyAttack(dt);
 
     updateCamera(dt);
 

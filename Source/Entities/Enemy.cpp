@@ -44,11 +44,16 @@ void Enemy::handleMove(float dt) {}
 
 void Enemy::handleFall(float dt) {}
 
+void Enemy::handleAttack(float dt) {}
+
 void Enemy::handleHit(float dt) {}
 
 void Enemy::handleDeath(float dt) {}
 
 void Enemy::updateAI(float dt) {}
+
+void Enemy::startAttack() {}
+void Enemy::updateAttack(float dt) {}
 
 void Enemy::receiveDamage(float amount, int attackID)
 {
@@ -63,7 +68,7 @@ void Enemy::receiveDamage(float amount, int attackID)
 
     stopAllActions();
 
-    AXLOG("Damage received: %f", amount);
+    AXLOG("Damage received by enemy: %f", amount);
 
     if (hp <= 0)
         onDeath();
@@ -119,6 +124,9 @@ void Enemy::update(float dt)
     case EnemyState::Fall:
         handleFall(dt);
         break;
+    case EnemyState::Attack:
+        handleAttack(dt);
+        break;
     case EnemyState::Hit:
         handleHit(dt);
         break;
@@ -127,6 +135,7 @@ void Enemy::update(float dt)
         break;
     }
     updateAnimation();
+    updateAttack(dt);
 
     velocity.y += GRAVITY * dt;
 }

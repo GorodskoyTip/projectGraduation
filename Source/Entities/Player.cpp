@@ -228,7 +228,6 @@ void Player::startAttack(int index)
 
 void Player::updateAttack(float dt)
 {
-
     if (attackActive)
     {
         float width  = 40.f;
@@ -247,13 +246,14 @@ void Player::updateAttack(float dt)
     }
 }
 
-void Player::receiveDamage(int amount)
+void Player::receiveDamage(float amount)
 {
     if (!isInvincible && hp > 0)
     {
         hp = std::max(0.0f, hp-amount);
         isInvincible = true;
         invincibilityTimer = 1;
+        AXLOG("Damage received: %f", amount);
     }
 }
 

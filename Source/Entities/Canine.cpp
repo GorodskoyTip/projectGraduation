@@ -30,11 +30,12 @@ bool Canine::init()
         return false;
     }
 
-    idleAnim  = createAnimation("wolfBlack", "idle", 0.1f);
-    runAnim   = createAnimation("wolfBlack", "run", 0.035f);
-    fallAnim  = createAnimation("wolfBlack", "idle", 0.1f);
-    hitAnim   = createAnimation("wolfBlack", "hit", 0.035);
-    deathAnim = createAnimation("wolfBlack", "death", 0.035f);
+    idleAnim   = createAnimation("wolfBlack", "idle", 0.1f);
+    runAnim    = createAnimation("wolfBlack", "run", 0.035f);
+    fallAnim   = createAnimation("wolfBlack", "idle", 0.1f);
+    attackAnim = createAnimation("wolfBlack", "attack", 0.1f);
+    hitAnim    = createAnimation("wolfBlack", "hit", 0.035);
+    deathAnim  = createAnimation("wolfBlack", "death", 0.035f);
 
     if (!idleAnim || !runAnim || !fallAnim || !hitAnim || !deathAnim)
     {
@@ -42,9 +43,11 @@ bool Canine::init()
         return false;
     }
 
-    aggroRange  = 400.f;
-    attackRange = 60.f;
-    hp          = 50.f;
+    aggroRange     = 400.f;
+    attackRange    = 60.f;
+    attackDamage   = 10;
+    attackDuration = attackAnim->getDuration();
+    hp             = 50.f;
 
     AXLOG("CANINE INIT OK");
     return true;
@@ -58,10 +61,19 @@ void Canine::handleIdle(float dt)
         state = EnemyState::Fall;
 }
 
-void Canine::handleMove(float dt) {
-}
+void Canine::handleMove(float dt) {}
 
 void Canine::handleFall(float dt) {}
+
+void Canine::handleAttack(float dt)
+{
+    velocity.x = 0;
+
+    attackTimer -= dt;
+
+    if (attackTimer <= 0)
+        state = EnemyState::Idle;
+}
 
 void Canine::handleHit(float dt)
 {
@@ -81,7 +93,45 @@ void Canine::handleHit(float dt)
 
 void Canine::handleDeath(float dt) {}
 
-void Canine::updateAI(float dt) {}
+void Canine::updateAI(float dt)
+{
+    if (attackCooldown > 0)
+        attackCooldown -= dt;
+
+    if (state == EnemyState::Idle)
+        startAttack();
+}
+
+void Canine::startAttack()
+{
+    if (attackCooldown > 0)
+        return;
+
+    state = EnemyState::Attack;
+
+    attackActive = true;
+    attackTimer  = attackDuration;
+
+    attackCooldown = 1.2f;
+}
+
+void Canine::updateAttack(float dt)
+{
+    if (attackActive)
+    {
+        float width  = 20.0f;
+        float height = 15.0f;
+
+        auto pos = getPosition();
+
+        float offsetX = facingRight ? 25.0f : -25.0f;
+
+        hitBox = ax::Rect(pos.x + offsetX - width / 2, pos.y - height, width, height);
+    }
+
+    if (attackTimer <= 0.0f)
+        attackActive = false;
+}
 
 void Canine::updateAnimation()
 {
@@ -100,6 +150,9 @@ void Canine::updateAnimation()
         break;
     case EnemyState::Fall:
         runAction(RepeatForever::create(Animate::create(fallAnim)));
+        break;
+    case EnemyState::Attack:
+        runAction(Animate::create(attackAnim));
         break;
     case EnemyState::Hit:
         runAction(Animate::create(hitAnim));
