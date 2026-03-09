@@ -40,6 +40,9 @@ bool Player::init()
     lightAttack1Anim = createAnimation("lightAttackFirstHit", 0.05);
     lightAttack2Anim = createAnimation("lightAttackSecondHit", 0.05);
     lightAttack3Anim = createAnimation("lightAttackThirdHit", 0.05);
+    heavyAttack1Anim = createAnimation("heavyAttackFirstHit", 0.05);
+    heavyAttack2Anim = createAnimation("heavyAttackSecondHit", 0.05);
+    heavyAttack3Anim = createAnimation("heavyAttackThirdHit", 0.05);
     hitAnim = createAnimation("damageReceived", 0.1);
     deathAnim = createAnimation("dead", 0.05);
 
@@ -57,6 +60,16 @@ bool Player::init()
 
 void Player::onKeyPressed(EventKeyboard::KeyCode key, Event*)
 {
+    if (state == PlayerState::Dead)
+    {
+        if (key == EventKeyboard::KeyCode::KEY_R)
+        {
+            hp = 100;
+            setPosition(200, 240);
+            state = PlayerState::Idle;
+        }
+    }
+
     if (state == PlayerState::Hit || state == PlayerState::Dead)
         return;
 
@@ -77,16 +90,35 @@ void Player::onKeyPressed(EventKeyboard::KeyCode key, Event*)
         }
     }
 
+    if (key == EventKeyboard::KeyCode::KEY_I)
+    {
+        if (!attackButtonHeld)
+        {
+            attackButtonHeld = true;
+
+            if (state != PlayerState::LightAttack && state != PlayerState::HeavyAttack)
+                startAttack(PlayerState::LightAttack, 0);
+            else
+            {
+                comboQueued      = true;
+                queuedAttackType = PlayerState::LightAttack;
+            }
+        }
+    }
+
     if (key == EventKeyboard::KeyCode::KEY_J)
     {
         if (!attackButtonHeld)
         {
             attackButtonHeld = true;
 
-            if (state != PlayerState::Attack)
-                startAttack(0);
+            if (state != PlayerState::LightAttack && state != PlayerState::HeavyAttack)
+                startAttack(PlayerState::HeavyAttack, 0);
             else
-                comboQueued = true;
+            {
+                comboQueued      = true;
+                queuedAttackType = PlayerState::HeavyAttack;
+            }
         }
     }
 }
@@ -95,6 +127,7 @@ void Player::onKeyReleased(EventKeyboard::KeyCode key, Event*)
 {
     if (key == EventKeyboard::KeyCode::KEY_A) moveLeft = false;
     if (key == EventKeyboard::KeyCode::KEY_D) moveRight = false;
+    if (key == EventKeyboard::KeyCode::KEY_I) attackButtonHeld = false;
     if (key == EventKeyboard::KeyCode::KEY_J) attackButtonHeld = false;
 }
 
@@ -152,8 +185,18 @@ void Player::setVelocityY(float y)
 
 void Player::updateAnimation()
 {
-    if (state == currentAnimationState && lastComboIndex == comboIndex)
-        return;
+    bool attackState = state == PlayerState::LightAttack || state == PlayerState::HeavyAttack;
+
+    if (!attackState)
+    {
+        if (state == currentAnimationState)
+            return;
+    }
+    else
+    {
+        if (state == currentAnimationState && lastAttackComboIndex == comboIndex)
+            return;
+    }
 
     stopAllActions();
 
@@ -162,22 +205,29 @@ void Player::updateAnimation()
     case PlayerState::Idle:
         runAction(RepeatForever::create(Animate::create(idleAnim)));
         break;
+
     case PlayerState::Run:
         runAction(RepeatForever::create(Animate::create(runAnim)));
         break;
+
     case PlayerState::Jump:
         runAction(Animate::create(jumpAnim));
         break;
+
     case PlayerState::Fall:
         runAction(RepeatForever::create(Animate::create(fallAnim)));
         break;
+
     case PlayerState::Hit:
         runAction(Animate::create(hitAnim));
         break;
+
     case PlayerState::Dead:
         runAction(Animate::create(deathAnim));
         break;
-    case PlayerState::Attack:
+
+    case PlayerState::LightAttack:
+    {
         ax::Animation* anim = nullptr;
 
         if (comboIndex == 0)
@@ -186,12 +236,34 @@ void Player::updateAnimation()
             anim = lightAttack2Anim;
         else if (comboIndex == 2)
             anim = lightAttack3Anim;
+
         if (anim)
             runAction(Animate::create(anim));
+
+        lastAttackComboIndex = comboIndex;
         break;
     }
+
+    case PlayerState::HeavyAttack:
+    {
+        ax::Animation* anim = nullptr;
+
+        if (comboIndex == 0)
+            anim = heavyAttack1Anim;
+        else if (comboIndex == 1)
+            anim = heavyAttack2Anim;
+        else if (comboIndex == 2)
+            anim = heavyAttack3Anim;
+
+        if (anim)
+            runAction(Animate::create(anim));
+
+        lastAttackComboIndex = comboIndex;
+        break;
+    }
+    }
+
     currentAnimationState = state;
-    lastComboIndex        = comboIndex;
 }
 
 ax::Animation* Player::createAnimation(const std::string& prefix, float delay)
@@ -227,14 +299,37 @@ float Player::getHP()
     return hp;
 }
 
-void Player::startAttack(int index)
+void Player::startAttack(PlayerState attackType, int index)
 {
     attackID++;
 
     comboIndex       = index;
-    state            = PlayerState::Attack;
+    state            = attackType;
     attackActive     = true;
-    attackTimer      = 0.4f;
+
+    ax::Animation* anim = nullptr;
+
+    if (attackType == PlayerState::LightAttack)
+    {
+        if (index == 0)
+            anim = lightAttack1Anim;
+        else if (index == 1)
+            anim = lightAttack2Anim;
+        else if (index == 3)
+            anim = lightAttack3Anim;
+    }
+    else if (attackType == PlayerState::HeavyAttack)
+    {
+        if (index == 0)
+            anim = heavyAttack1Anim;
+        else if (index == 1)
+            anim = heavyAttack2Anim;
+        else if (index == 2)
+            anim = heavyAttack3Anim;
+    }
+
+    if (anim)
+        attackTimer = anim->getDuration();
 }
 
 void Player::updateAttack(float dt)
@@ -259,7 +354,7 @@ void Player::updateAttack(float dt)
 
 void Player::receiveDamage(float amount)
 {
-    if (isInvincible)
+    if (isInvincible || state == PlayerState::Dead)
         return;
 
     hp                 = std::max(0.0f, hp - amount);
@@ -283,6 +378,16 @@ void Player::receiveDamage(float amount)
 void Player::onDeath()
 {
     state = PlayerState::Dead;
+
+    velocity = ax::Vec2::ZERO;
+
+    attackActive = false;
+    comboQueued  = false;
+    inRecovery   = false;
+
+    deathTimer = 2.0f;
+
+    stopAllActions();
 }
 
 ax::Rect Player::getHurtBox() const
@@ -382,7 +487,7 @@ void Player::handleAttack(float dt)
             if (comboQueued && comboIndex < 2)
             {
                 comboQueued = false;
-                startAttack(comboIndex + 1);
+                startAttack(queuedAttackType, comboIndex + 1);
                 return;
             }
 
@@ -397,7 +502,7 @@ void Player::handleAttack(float dt)
         {
             comboQueued = false;
             inRecovery  = false;
-            startAttack(comboIndex + 1);
+            startAttack(queuedAttackType, comboIndex + 1);
             return;
         }
 
@@ -440,7 +545,7 @@ void Player::handleHit(float dt)
 void Player::handleDead(float dt)
 {
     velocity.x = 0;
-    stopAllActions();
+    deathTimer -= dt;
 }
 
 void Player::updateFacingDirection()
@@ -475,7 +580,10 @@ void Player::update(float dt)
     case PlayerState::Fall:
         handleFall(dt);
         break;
-    case PlayerState::Attack:
+    case PlayerState::LightAttack:
+        handleAttack(dt);
+        break;
+    case PlayerState::HeavyAttack:
         handleAttack(dt);
         break;
     case PlayerState::Hit:

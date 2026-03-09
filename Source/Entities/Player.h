@@ -8,7 +8,8 @@ enum class PlayerState
     Run,
     Jump,
     Fall,
-    Attack,
+    LightAttack,
+    HeavyAttack,
     Hit,
     Dead
 };
@@ -76,6 +77,9 @@ private:
     ax::Animation* lightAttack1Anim;
     ax::Animation* lightAttack2Anim;
     ax::Animation* lightAttack3Anim;
+    ax::Animation* heavyAttack1Anim;
+    ax::Animation* heavyAttack2Anim;
+    ax::Animation* heavyAttack3Anim;
     ax::Animation* hitAnim;
     ax::Animation* deathAnim;
     PlayerState currentAnimationState = PlayerState::Idle;
@@ -84,7 +88,8 @@ private:
 
     float invincibilityTimer;
     bool isInvincible;
-    float hitTimer = 0.0f;
+    float hitTimer   = 0.0f;
+    float deathTimer = 0.0f;
 
     ax::Rect hitBox;
     bool attackButtonHeld = false;
@@ -92,12 +97,14 @@ private:
     float attackTimer     = 0.f;
     int attackDamage      = 10;
 
-    int comboIndex         = 0;
-    int lastComboIndex     = -1;
-    bool comboQueued       = false;
-    void startAttack(int index);
+    int comboIndex           = 0;
+    int lastComboIndex       = -1;
+    int lastAttackComboIndex = -1;
+    PlayerState queuedAttackType;
+    bool comboQueued         = false;
+    void startAttack(PlayerState attackType, int index);
     float recoveryTimer = 0.f;
-    bool inRecovery      = false;
+    bool inRecovery     = false;
 
     int attackID = 0;
 };
