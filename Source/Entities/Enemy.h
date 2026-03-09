@@ -36,6 +36,7 @@ public:
     void receiveDamage(float amount, int attackID);
     void onDeath();
     bool isDead() const { return state == EnemyState::Dead; }
+    bool readyToRemove() const { return state == EnemyState::Dead && deathTimer <= 0.0f; }
 
     virtual void updateAttack(float dt);
     ax::Rect getHitBox() { return hitBox; }
@@ -67,6 +68,7 @@ protected:
 
     float hitTimer           = 0.0f;
     int lastReceivedAttackID = -1;
+    float deathTimer         = 0.0f;
 
     ax::Rect hitBox;
     bool attackActive = false;

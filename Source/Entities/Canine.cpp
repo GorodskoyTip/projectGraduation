@@ -34,7 +34,7 @@ bool Canine::init()
     runAnim    = createAnimation("wolfBlack", "run", 0.035f);
     fallAnim   = createAnimation("wolfBlack", "idle", 0.1f);
     attackAnim = createAnimation("wolfBlack", "attack", 0.1f);
-    hitAnim    = createAnimation("wolfBlack", "hit", 0.035);
+    hitAnim    = createAnimation("wolfBlack", "hit", 0.035f);
     deathAnim  = createAnimation("wolfBlack", "death", 0.035f);
 
     if (!idleAnim || !runAnim || !fallAnim || !hitAnim || !deathAnim)
@@ -93,8 +93,10 @@ void Canine::handleHit(float dt)
 
 void Canine::handleDeath(float dt)
 {
-    velocity.x = 0;
-    stopAllActions();
+    velocity = Vec2::ZERO;
+
+    if (deathTimer > 0)
+        deathTimer -= dt;
 }
 
 void Canine::updateAI(float dt)
@@ -139,7 +141,7 @@ void Canine::updateAttack(float dt)
 
 void Canine::updateAnimation()
 {
-    if (state == currentAnimationState && state != EnemyState::Hit)
+    if (state == currentAnimationState)
         return;
 
     stopAllActions();

@@ -77,6 +77,14 @@ void Enemy::receiveDamage(float amount, int attackID)
 void Enemy::onDeath()
 {
     state = EnemyState::Dead;
+
+    attackActive = false;
+    attackTimer  = 0;
+    velocity     = ax::Vec2::ZERO;
+
+    deathTimer = 2.0f;
+
+    stopAllActions();
 }
 
 ax::Animation* Enemy::createAnimation(const std::string& entity, const std::string& prefix, float delay)
@@ -111,6 +119,12 @@ void Enemy::updateAnimation() {}
 
 void Enemy::update(float dt)
 {
+    if (state == EnemyState::Dead)
+    {
+        handleDeath(dt);
+        updateAnimation();
+        return;
+    }
     updateAI(dt);
 
     switch (state)

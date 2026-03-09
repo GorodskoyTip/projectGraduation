@@ -108,12 +108,15 @@ void GameScene::drawDebug()
                                {playerPhysRect.getMinX(), playerPhysRect.getMaxY()}};
         debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 0, 1, 1));
 
-        auto enemyPhysRect = canine->getPhysicsRect();
-        ax::Vec2 everts[4] = {{enemyPhysRect.getMinX(), enemyPhysRect.getMinY()},
-                              {enemyPhysRect.getMaxX(), enemyPhysRect.getMinY()},
-                              {enemyPhysRect.getMaxX(), enemyPhysRect.getMaxY()},
-                              {enemyPhysRect.getMinX(), enemyPhysRect.getMaxY()}};
-        debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 0, 1, 1));
+        if (canine)
+        {
+            auto enemyPhysRect = canine->getPhysicsRect();
+            ax::Vec2 everts[4] = {{enemyPhysRect.getMinX(), enemyPhysRect.getMinY()},
+                                  {enemyPhysRect.getMaxX(), enemyPhysRect.getMinY()},
+                                  {enemyPhysRect.getMaxX(), enemyPhysRect.getMaxY()},
+                                  {enemyPhysRect.getMinX(), enemyPhysRect.getMaxY()}};
+            debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 0, 1, 1));
+        }
 
         for (const auto& col : physics.getColliders())
         {
@@ -134,12 +137,15 @@ void GameScene::drawDebug()
                               {playerHurtBox.getMinX(), playerHurtBox.getMaxY()}};
         debugDraw->drawPoly(verts, 4, true, ax::Color4F(1, 0, 0, 1));
 
-        auto enemyHurtBox  = canine->getHurtBox();
-        ax::Vec2 everts[4] = {{enemyHurtBox.getMinX(), enemyHurtBox.getMinY()},
-                              {enemyHurtBox.getMaxX(), enemyHurtBox.getMinY()},
-                              {enemyHurtBox.getMaxX(), enemyHurtBox.getMaxY()},
-                              {enemyHurtBox.getMinX(), enemyHurtBox.getMaxY()}};
-        debugDraw->drawPoly(everts, 4, true, ax::Color4F(1, 0, 0, 1));
+        if (canine)
+        {
+            auto enemyHurtBox  = canine->getHurtBox();
+            ax::Vec2 everts[4] = {{enemyHurtBox.getMinX(), enemyHurtBox.getMinY()},
+                                  {enemyHurtBox.getMaxX(), enemyHurtBox.getMinY()},
+                                  {enemyHurtBox.getMaxX(), enemyHurtBox.getMaxY()},
+                                  {enemyHurtBox.getMinX(), enemyHurtBox.getMaxY()}};
+            debugDraw->drawPoly(everts, 4, true, ax::Color4F(1, 0, 0, 1));
+        }
     }
     if (debugHitBox)
     {
@@ -150,17 +156,23 @@ void GameScene::drawDebug()
                              {playerHitBox.getMinX(), playerHitBox.getMaxY()}};
         debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 1, 1, 1));
 
-        auto enemyHitBox = canine->getHitBox();
-        ax::Vec2 everts[4] = {{enemyHitBox.getMinX(), enemyHitBox.getMinY()},
-                             {enemyHitBox.getMaxX(), enemyHitBox.getMinY()},
-                             {enemyHitBox.getMaxX(), enemyHitBox.getMaxY()},
-                             {enemyHitBox.getMinX(), enemyHitBox.getMaxY()}};
-        debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 1, 1, 1));
+        if (canine)
+        {
+            auto enemyHitBox   = canine->getHitBox();
+            ax::Vec2 everts[4] = {{enemyHitBox.getMinX(), enemyHitBox.getMinY()},
+                                  {enemyHitBox.getMaxX(), enemyHitBox.getMinY()},
+                                  {enemyHitBox.getMaxX(), enemyHitBox.getMaxY()},
+                                  {enemyHitBox.getMinX(), enemyHitBox.getMaxY()}};
+            debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 1, 1, 1));
+        }
     }
 }
 
 void GameScene::updatePlayerAttack(float dt)
 {
+    if (!canine || canine->isDead())
+        return;
+
     if (!player->isAttackActive())
         return;
 
@@ -172,6 +184,9 @@ void GameScene::updatePlayerAttack(float dt)
 
 void GameScene::updateEnemyAttack(float dt)
 {
+    if (!canine || canine->isDead())
+        return;
+
     if (canine->isAttackActive())
     {
         if (canine->getHitBox().intersectsRect(player->getHurtBox()))
@@ -212,13 +227,22 @@ void GameScene::update(float dt)
         return;
 
     player->update(dt);
-    canine->update(dt);
+
+    if (canine)
+        canine->update(dt);
 
     physics.updatePlayer(player, dt);
-    physics.updateEnemy(canine, dt);
+    if (canine)
+        physics.updateEnemy(canine, dt);
 
     updatePlayerAttack(dt);
     updateEnemyAttack(dt);
+
+    if (canine && canine->readyToRemove())
+    {
+        canine->removeFromParent();
+        canine = nullptr;
+    }
 
     updateCamera(dt);
 
