@@ -119,23 +119,29 @@ void Canine::startAttack()
     attackTimer  = attackDuration;
 
     attackCooldown = 1.2f;
+
+    attackElapsed     = 0.f;
+    attackActiveStart = attackDuration * 0.55f;
+    attackActiveEnd   = attackDuration * 0.8f;
 }
 
 void Canine::updateAttack(float dt)
 {
-    if (attackActive)
+    attackElapsed += dt;
+
+if (attackElapsed >= attackActiveStart && attackElapsed <= attackActiveEnd)
     {
+        attackActive = true;
+
         float width  = 10.0f;
         float height = 15.0f;
 
-        auto pos = getPosition();
-
+        auto pos      = getPosition();
         float offsetX = facingRight ? 25.0f : -25.0f;
 
         hitBox = ax::Rect(pos.x + offsetX - width / 2, pos.y - height, width, height);
     }
-
-    if (attackTimer <= 0.0f)
+    else
         attackActive = false;
 }
 

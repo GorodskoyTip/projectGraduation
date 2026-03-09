@@ -187,7 +187,7 @@ void GameScene::updatePlayerAttack(float dt)
 
     if (player->getHitBox().intersectsRect(canine->getHurtBox()))
     {
-        canine->receiveDamage(player->getAttackDamage(), player->getAttackID());
+        canine->receiveDamage(player->getAttackDamage(player->getAttackType()), player->getAttackID());
     }
 }
 

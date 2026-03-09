@@ -46,7 +46,8 @@ public:
     void updateAttack(float dt);
     ax::Rect getHitBox() { return hitBox; }
     bool isAttackActive() { return attackActive; }
-    int getAttackDamage() { return attackDamage; }
+    int getAttackDamage(PlayerState attackType);
+    PlayerState getAttackType() { return state; }
 
     int getAttackID() const { return attackID; }
 
@@ -95,13 +96,18 @@ private:
     bool attackButtonHeld = false;
     bool attackActive     = false;
     float attackTimer     = 0.f;
-    int attackDamage      = 10;
+    int lightAttackDamage = 10;
+    int heavyAttackDamage = 15;
+
+    float attackActiveStart = 0.f;
+    float attackActiveEnd   = 0.f;
+    float attackElapsed     = 0.f;
 
     int comboIndex           = 0;
     int lastComboIndex       = -1;
     int lastAttackComboIndex = -1;
     PlayerState queuedAttackType;
-    bool comboQueued         = false;
+    bool comboQueued = false;
     void startAttack(PlayerState attackType, int index);
     float recoveryTimer = 0.f;
     bool inRecovery     = false;

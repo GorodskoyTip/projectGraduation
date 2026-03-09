@@ -37,12 +37,12 @@ bool Player::init()
     runAnim  = createAnimation("run", 0.035f);
     jumpAnim = createAnimation("jump", 0.05f);
     fallAnim = createAnimation("fall", 0.05f);
-    lightAttack1Anim = createAnimation("lightAttackFirstHit", 0.05);
-    lightAttack2Anim = createAnimation("lightAttackSecondHit", 0.05);
-    lightAttack3Anim = createAnimation("lightAttackThirdHit", 0.05);
-    heavyAttack1Anim = createAnimation("heavyAttackFirstHit", 0.05);
-    heavyAttack2Anim = createAnimation("heavyAttackSecondHit", 0.05);
-    heavyAttack3Anim = createAnimation("heavyAttackThirdHit", 0.05);
+    lightAttack1Anim = createAnimation("lightAttackFirstHit", 0.07);
+    lightAttack2Anim = createAnimation("lightAttackSecondHit", 0.07);
+    lightAttack3Anim = createAnimation("lightAttackThirdHit", 0.07);
+    heavyAttack1Anim = createAnimation("heavyAttackFirstHit", 0.07);
+    heavyAttack2Anim = createAnimation("heavyAttackSecondHit", 0.07);
+    heavyAttack3Anim = createAnimation("heavyAttackThirdHit", 0.07);
     hitAnim = createAnimation("damageReceived", 0.1);
     deathAnim = createAnimation("dead", 0.05);
 
@@ -315,7 +315,7 @@ void Player::startAttack(PlayerState attackType, int index)
             anim = lightAttack1Anim;
         else if (index == 1)
             anim = lightAttack2Anim;
-        else if (index == 3)
+        else if (index == 2)
             anim = lightAttack3Anim;
     }
     else if (attackType == PlayerState::HeavyAttack)
@@ -329,27 +329,52 @@ void Player::startAttack(PlayerState attackType, int index)
     }
 
     if (anim)
-        attackTimer = anim->getDuration();
+    {
+        attackTimer   = anim->getDuration();
+        attackElapsed = 0.f;
+    }
+
+    if (attackType == PlayerState::LightAttack)
+    {
+        attackActiveStart = attackTimer * 0.45f;
+        attackActiveEnd   = attackTimer * 0.85f;
+    }
+    else if (attackType == PlayerState::HeavyAttack)
+    {
+        attackActiveStart = attackTimer * 0.55f;
+        attackActiveEnd   = attackTimer * 0.85f;
+    } 
 }
 
 void Player::updateAttack(float dt)
 {
-    if (attackActive)
+    if (state != PlayerState::LightAttack && state != PlayerState::HeavyAttack)
+        return;
+
+    attackElapsed += dt;
+
+    if (attackElapsed >= attackActiveStart && attackElapsed <= attackActiveEnd)
     {
+        attackActive = true;
+
         float width  = 40.f;
         float height = 30.f;
 
-        auto pos = getPosition();
-
+        auto pos      = getPosition();
         float offsetX = facingRight ? -20.f : 30.f;
 
-        hitBox = ax::Rect(pos.x + offsetX - width/1.5, pos.y - height, width, height);
-
-        if (attackTimer <= 0.f)
-        {
-            attackActive = false;
-        }
+        hitBox = ax::Rect(pos.x + offsetX - width / 1.5, pos.y - height, width, height);
     }
+    else
+        attackActive = false;
+}
+
+int Player::getAttackDamage(PlayerState attackType)
+{
+    if (attackType == PlayerState::LightAttack)
+        return lightAttackDamage;
+    else if (attackType == PlayerState::HeavyAttack)
+        return heavyAttackDamage;
 }
 
 void Player::receiveDamage(float amount)
@@ -492,6 +517,7 @@ void Player::handleAttack(float dt)
             }
 
             // Иначе — уходим в recovery
+            comboQueued   = false;
             inRecovery    = true;
             recoveryTimer = 0.25f;  // ← вот твоя "пауза в последнем кадре"
         }

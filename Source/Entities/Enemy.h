@@ -76,5 +76,9 @@ protected:
     float attackCooldown = 0.0f;
     float attackDuration = 0.0f;
 
+    float attackActiveStart = 0.f;
+    float attackActiveEnd   = 0.f;
+    float attackElapsed     = 0.f;
+
     int attackDamage;
 };
