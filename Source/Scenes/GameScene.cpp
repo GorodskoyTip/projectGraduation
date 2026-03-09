@@ -101,12 +101,15 @@ void GameScene::drawDebug()
     debugDraw->clear();
     if (debugPhysics)
     {
-        auto playerPhysRect = player->getPhysicsRect();
-        ax::Vec2 verts[4]   = {{playerPhysRect.getMinX(), playerPhysRect.getMinY()},
-                               {playerPhysRect.getMaxX(), playerPhysRect.getMinY()},
-                               {playerPhysRect.getMaxX(), playerPhysRect.getMaxY()},
-                               {playerPhysRect.getMinX(), playerPhysRect.getMaxY()}};
-        debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 0, 1, 1));
+        if (player)
+        {
+            auto playerPhysRect = player->getPhysicsRect();
+            ax::Vec2 verts[4]   = {{playerPhysRect.getMinX(), playerPhysRect.getMinY()},
+                                   {playerPhysRect.getMaxX(), playerPhysRect.getMinY()},
+                                   {playerPhysRect.getMaxX(), playerPhysRect.getMaxY()},
+                                   {playerPhysRect.getMinX(), playerPhysRect.getMaxY()}};
+            debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 0, 1, 1));
+        }
 
         if (canine)
         {
@@ -130,12 +133,15 @@ void GameScene::drawDebug()
     }
     if (debugHurtBox)
     {
-        auto playerHurtBox = player->getHurtBox();
-        ax::Vec2 verts[4]  = {{playerHurtBox.getMinX(), playerHurtBox.getMinY()},
-                              {playerHurtBox.getMaxX(), playerHurtBox.getMinY()},
-                              {playerHurtBox.getMaxX(), playerHurtBox.getMaxY()},
-                              {playerHurtBox.getMinX(), playerHurtBox.getMaxY()}};
-        debugDraw->drawPoly(verts, 4, true, ax::Color4F(1, 0, 0, 1));
+        if (player)
+        {
+            auto playerHurtBox = player->getHurtBox();
+            ax::Vec2 verts[4]  = {{playerHurtBox.getMinX(), playerHurtBox.getMinY()},
+                                  {playerHurtBox.getMaxX(), playerHurtBox.getMinY()},
+                                  {playerHurtBox.getMaxX(), playerHurtBox.getMaxY()},
+                                  {playerHurtBox.getMinX(), playerHurtBox.getMaxY()}};
+            debugDraw->drawPoly(verts, 4, true, ax::Color4F(1, 0, 0, 1));
+        }
 
         if (canine)
         {
@@ -149,14 +155,17 @@ void GameScene::drawDebug()
     }
     if (debugHitBox)
     {
-        auto playerHitBox = player->getHitBox();
-        ax::Vec2 verts[4] = {{playerHitBox.getMinX(), playerHitBox.getMinY()},
-                             {playerHitBox.getMaxX(), playerHitBox.getMinY()},
-                             {playerHitBox.getMaxX(), playerHitBox.getMaxY()},
-                             {playerHitBox.getMinX(), playerHitBox.getMaxY()}};
-        debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 1, 1, 1));
+        if (player && player->isAttackActive())
+        {
+            auto playerHitBox = player->getHitBox();
+            ax::Vec2 verts[4] = {{playerHitBox.getMinX(), playerHitBox.getMinY()},
+                                 {playerHitBox.getMaxX(), playerHitBox.getMinY()},
+                                 {playerHitBox.getMaxX(), playerHitBox.getMaxY()},
+                                 {playerHitBox.getMinX(), playerHitBox.getMaxY()}};
+            debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 1, 1, 1));
+        }
 
-        if (canine)
+        if (canine && canine->isAttackActive())
         {
             auto enemyHitBox   = canine->getHitBox();
             ax::Vec2 everts[4] = {{enemyHitBox.getMinX(), enemyHitBox.getMinY()},
