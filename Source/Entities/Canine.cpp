@@ -91,7 +91,11 @@ void Canine::handleHit(float dt)
     }
 }
 
-void Canine::handleDeath(float dt) {}
+void Canine::handleDeath(float dt)
+{
+    velocity.x = 0;
+    stopAllActions();
+}
 
 void Canine::updateAI(float dt)
 {

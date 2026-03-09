@@ -439,7 +439,8 @@ void Player::handleHit(float dt)
 
 void Player::handleDead(float dt)
 {
-    velocity.x = 0; 
+    velocity.x = 0;
+    stopAllActions();
 }
 
 void Player::updateFacingDirection()
