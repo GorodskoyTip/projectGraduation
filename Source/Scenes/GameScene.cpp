@@ -56,6 +56,8 @@ bool GameScene::init()
     canine->setPosition(400, 240);
     world->addChild(canine);
 
+    canine->setTarget(player);
+
     debugDraw = ax::DrawNode::create();
     world->addChild(debugDraw, 999);
 

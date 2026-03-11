@@ -26,7 +26,7 @@ public:
     void setVelocityY(float y);
 
     virtual void updateAI(float dt);
-    void setTarget(Player* player);
+    void setTarget(Player* player) { target = player; }
 
     void setState(EnemyState newState);
     ax::Animation* createAnimation(const std::string& entity, const std::string& prefix, float delay);

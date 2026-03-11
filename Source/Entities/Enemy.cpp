@@ -2,7 +2,6 @@
 
 USING_NS_AX;
 
-static constexpr float MOVE_SPEED = 80.0f;
 static constexpr float GRAVITY    = -900.0f;
 
 bool Enemy::initBase()
@@ -64,7 +63,7 @@ void Enemy::receiveDamage(float amount, int attackID)
 
     hp = std::max(0.0f, hp - amount);
     state = EnemyState::Hit;
-    hitTimer = 0.5;
+    hitTimer = 1.0f;
 
     stopAllActions();
 

@@ -1,4 +1,7 @@
 #include "Canine.h"
+#include "Player.h"
+
+static constexpr float ENEMY_MOVE_SPEED = 150.0f;
 
 USING_NS_AX;
 
@@ -31,7 +34,7 @@ bool Canine::init()
     }
 
     idleAnim   = createAnimation("wolfBlack", "idle", 0.1f);
-    runAnim    = createAnimation("wolfBlack", "run", 0.035f);
+    runAnim    = createAnimation("wolfBlack", "run", 0.05f);
     fallAnim   = createAnimation("wolfBlack", "idle", 0.1f);
     attackAnim = createAnimation("wolfBlack", "attack", 0.1f);
     hitAnim    = createAnimation("wolfBlack", "hit", 0.035f);
@@ -44,7 +47,7 @@ bool Canine::init()
     }
 
     aggroRange     = 400.f;
-    attackRange    = 60.f;
+    attackRange    = 40.f;
     attackDamage   = 10;
     attackDuration = attackAnim->getDuration();
     hp             = 50.f;
@@ -61,7 +64,37 @@ void Canine::handleIdle(float dt)
         state = EnemyState::Fall;
 }
 
-void Canine::handleMove(float dt) {}
+void Canine::handleMove(float dt)
+{
+    float dx = target->getPositionX() - getPositionX();
+    float dy = std::abs(target->getPositionY() - getPositionY());
+
+    constexpr float TURN_THRESHOLD = 10.f;
+    constexpr float HEIGHT_TOLERANCE = 30.f;
+
+    if (dx <= attackRange && dy > HEIGHT_TOLERANCE)
+    {
+        velocity.x = 0;
+        state      = EnemyState::Idle;
+        return;
+    }
+    
+    if (std::abs(dx) > TURN_THRESHOLD)
+    {
+        if (dx > 0)
+        {
+            velocity.x = ENEMY_MOVE_SPEED;
+            setFlippedX(true);
+            facingRight = false;
+        }
+        else
+        {
+            velocity.x = -ENEMY_MOVE_SPEED;
+            setFlippedX(false);
+            facingRight = true;
+        }
+    }
+}
 
 void Canine::handleFall(float dt) {}
 
@@ -101,16 +134,39 @@ void Canine::handleDeath(float dt)
 
 void Canine::updateAI(float dt)
 {
+    if (!target)
+        return;
+
+    if (state == EnemyState::Attack || state == EnemyState::Hit || state == EnemyState::Dead)
+        return;
+
     if (attackCooldown > 0)
         attackCooldown -= dt;
 
-    if (state == EnemyState::Idle)
-        startAttack();
+    float dx = std::abs(target->getPositionX() - getPositionX());
+    float dy = std::abs(target->getPositionY() - getPositionY());
+
+    constexpr float HEIGHT_TOLERANCE = 30.f;
+
+    if (dx > aggroRange)
+    {
+        state = EnemyState::Idle;
+        return;
+    }
+
+    if (dx <= attackRange && dy <= HEIGHT_TOLERANCE)
+    {
+        if (attackCooldown <= 0)
+            startAttack();
+        return;
+    }
+
+    state = EnemyState::Move;
 }
 
 void Canine::startAttack()
 {
-    if (attackCooldown > 0)
+    if (attackCooldown > 0 || hitTimer > 0)
         return;
 
     state = EnemyState::Attack;
@@ -118,11 +174,11 @@ void Canine::startAttack()
     attackActive = true;
     attackTimer  = attackDuration;
 
-    attackCooldown = 1.2f;
+    attackCooldown = 2.0f;
 
     attackElapsed     = 0.f;
     attackActiveStart = attackDuration * 0.55f;
-    attackActiveEnd   = attackDuration * 0.8f;
+    attackActiveEnd   = attackDuration * 0.7f;
 }
 
 void Canine::updateAttack(float dt)
@@ -137,7 +193,7 @@ if (attackElapsed >= attackActiveStart && attackElapsed <= attackActiveEnd)
         float height = 15.0f;
 
         auto pos      = getPosition();
-        float offsetX = facingRight ? 25.0f : -25.0f;
+        float offsetX = facingRight ? -25.0f : 25.0f;
 
         hitBox = ax::Rect(pos.x + offsetX - width / 2, pos.y - height, width, height);
     }
