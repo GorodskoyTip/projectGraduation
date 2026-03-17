@@ -1,5 +1,6 @@
 #pragma once
 #include "axmol.h"
+#include "Entities/EnemyTypes.h"
 
 enum class EnemyState
 {
@@ -45,6 +46,8 @@ public:
     virtual void startAttack();
 
 protected:
+    EnemyType type;
+
     ax::Vec2 velocity;
 
     bool facingRight = false;

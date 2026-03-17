@@ -28,22 +28,21 @@ bool GameScene::init()
     this->addChild(world);
 
     physics.addCollider({ax::Rect(0, 0, 3000, 100), ColliderType::Solid});
-    physics.addCollider({ax::Rect(0, 0, 50, 1000), ColliderType::Solid});
-    physics.addCollider({ax::Rect(2950, 0, 50, 1000), ColliderType::Solid});
-    physics.addCollider({ax::Rect(600, 150, 150, 20), ColliderType::OneWay});
-
     auto ground = ax::LayerColor::create(ax::Color4B::RED, 3000, 100);
     ground->setPosition(0, 0);
     world->addChild(ground);
 
+    physics.addCollider({ax::Rect(0, 0, 50, 1000), ColliderType::Solid});
     auto wallL = ax::LayerColor::create(ax::Color4B::GRAY, 50, 1000);
     wallL->setPosition(0, 0);
     world->addChild(wallL);
 
+    physics.addCollider({ax::Rect(2950, 0, 50, 1000), ColliderType::Solid});
     auto wallR = ax::LayerColor::create(ax::Color4B::GRAY, 50, 1000);
     wallR->setPosition(2950, 0);
     world->addChild(wallR);
 
+    physics.addCollider({ax::Rect(600, 150, 150, 20), ColliderType::OneWay});
     auto platform = ax::LayerColor::create(ax::Color4B::GREEN, 150, 20);
     platform->setPosition(600, 150);
     world->addChild(platform);
@@ -52,11 +51,26 @@ bool GameScene::init()
     player->setPosition(200, 240);
     world->addChild(player);
 
-    canine = Canine::create();
-    canine->setPosition(400, 240);
-    world->addChild(canine);
+    spawnPoints.push_back({EnemyType::Canine, {400, 240}});
+    spawnPoints.push_back({EnemyType::Canine, {700, 240}});
 
-    canine->setTarget(player);
+    for (auto& spawn : spawnPoints)
+    {
+        Enemy* enemy = createEnemy(spawn.type);
+
+        if (!enemy)
+            continue;
+
+        enemy->setPosition(spawn.position);
+
+        world->addChild(enemy);
+        enemies.push_back(enemy);
+    }
+
+    for (auto enemy : enemies)
+    {
+        enemy->setTarget(player);
+    }
 
     debugDraw = ax::DrawNode::create();
     world->addChild(debugDraw, 999);
@@ -98,6 +112,17 @@ void GameScene::onExit()
     Scene::onExit();
 }
 
+Enemy* GameScene::createEnemy(EnemyType type)
+{
+    switch (type)
+    {
+    case EnemyType::Canine:
+        return Canine::create();
+    default:
+        return nullptr;
+    }
+}
+
 void GameScene::drawDebug()
 {
     debugDraw->clear();
@@ -113,14 +138,17 @@ void GameScene::drawDebug()
             debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 0, 1, 1));
         }
 
-        if (canine)
+        for (auto enemy : enemies)
         {
-            auto enemyPhysRect = canine->getPhysicsRect();
-            ax::Vec2 everts[4] = {{enemyPhysRect.getMinX(), enemyPhysRect.getMinY()},
-                                  {enemyPhysRect.getMaxX(), enemyPhysRect.getMinY()},
-                                  {enemyPhysRect.getMaxX(), enemyPhysRect.getMaxY()},
-                                  {enemyPhysRect.getMinX(), enemyPhysRect.getMaxY()}};
-            debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 0, 1, 1));
+            if (enemy)
+            {
+                auto enemyPhysRect = enemy->getPhysicsRect();
+                ax::Vec2 everts[4] = {{enemyPhysRect.getMinX(), enemyPhysRect.getMinY()},
+                                      {enemyPhysRect.getMaxX(), enemyPhysRect.getMinY()},
+                                      {enemyPhysRect.getMaxX(), enemyPhysRect.getMaxY()},
+                                      {enemyPhysRect.getMinX(), enemyPhysRect.getMaxY()}};
+                debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 0, 1, 1));
+            }
         }
 
         for (const auto& col : physics.getColliders())
@@ -145,14 +173,17 @@ void GameScene::drawDebug()
             debugDraw->drawPoly(verts, 4, true, ax::Color4F(1, 0, 0, 1));
         }
 
-        if (canine)
+        for (auto enemy : enemies)
         {
-            auto enemyHurtBox  = canine->getHurtBox();
-            ax::Vec2 everts[4] = {{enemyHurtBox.getMinX(), enemyHurtBox.getMinY()},
-                                  {enemyHurtBox.getMaxX(), enemyHurtBox.getMinY()},
-                                  {enemyHurtBox.getMaxX(), enemyHurtBox.getMaxY()},
-                                  {enemyHurtBox.getMinX(), enemyHurtBox.getMaxY()}};
-            debugDraw->drawPoly(everts, 4, true, ax::Color4F(1, 0, 0, 1));
+            if (enemy)
+            {
+                auto enemyHurtBox  = enemy->getHurtBox();
+                ax::Vec2 everts[4] = {{enemyHurtBox.getMinX(), enemyHurtBox.getMinY()},
+                                      {enemyHurtBox.getMaxX(), enemyHurtBox.getMinY()},
+                                      {enemyHurtBox.getMaxX(), enemyHurtBox.getMaxY()},
+                                      {enemyHurtBox.getMinX(), enemyHurtBox.getMaxY()}};
+                debugDraw->drawPoly(everts, 4, true, ax::Color4F(1, 0, 0, 1));
+            }
         }
     }
     if (debugHitBox)
@@ -167,43 +198,48 @@ void GameScene::drawDebug()
             debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 1, 1, 1));
         }
 
-        if (canine && canine->isAttackActive())
+        for (auto enemy : enemies)
         {
-            auto enemyHitBox   = canine->getHitBox();
-            ax::Vec2 everts[4] = {{enemyHitBox.getMinX(), enemyHitBox.getMinY()},
-                                  {enemyHitBox.getMaxX(), enemyHitBox.getMinY()},
-                                  {enemyHitBox.getMaxX(), enemyHitBox.getMaxY()},
-                                  {enemyHitBox.getMinX(), enemyHitBox.getMaxY()}};
-            debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 1, 1, 1));
+            if (enemy && enemy->isAttackActive())
+            {
+                auto enemyHitBox   = enemy->getHitBox();
+                ax::Vec2 everts[4] = {{enemyHitBox.getMinX(), enemyHitBox.getMinY()},
+                                      {enemyHitBox.getMaxX(), enemyHitBox.getMinY()},
+                                      {enemyHitBox.getMaxX(), enemyHitBox.getMaxY()},
+                                      {enemyHitBox.getMinX(), enemyHitBox.getMaxY()}};
+                debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 1, 1, 1));
+            }
         }
     }
 }
 
 void GameScene::updatePlayerAttack(float dt)
 {
-    if (!canine || canine->isDead())
-        return;
-
-    if (!player->isAttackActive())
-        return;
-
-    if (player->getHitBox().intersectsRect(canine->getHurtBox()))
+    for (auto enemy : enemies)
     {
-        canine->receiveDamage(player->getAttackDamage(player->getAttackType()), player->getAttackID());
+        if (!enemy || enemy->isDead())
+            return;
+
+        if (!player->isAttackActive())
+            return;
+
+        if (player->getHitBox().intersectsRect(enemy->getHurtBox()))
+            enemy->receiveDamage(player->getAttackDamage(player->getAttackType()), player->getAttackID());
     }
 }
 
 void GameScene::updateEnemyAttack(float dt)
 {
-    if (!canine || canine->isDead())
-        return;
-
-    if (canine->isAttackActive())
+    for (auto enemy : enemies)
     {
-        if (canine->getHitBox().intersectsRect(player->getHurtBox()))
-        {
-            player->receiveDamage(canine->getAttackDamage());
-        }
+        if (!enemy || enemy->isDead())
+            return;
+
+        if (!enemy->isAttackActive())
+            return;
+
+        if (enemy->getHitBox().intersectsRect(player->getHurtBox()))
+            player->receiveDamage(enemy->getAttackDamage());
     }
 }
 
@@ -238,21 +274,26 @@ void GameScene::update(float dt)
         return;
 
     player->update(dt);
-
-    if (canine)
-        canine->update(dt);
-
     physics.updatePlayer(player, dt);
-    if (canine)
-        physics.updateEnemy(canine, dt);
+
+    for (auto enemy : enemies)
+    {
+        enemy->update(dt);
+        physics.updateEnemy(enemy, dt);
+    }
 
     updatePlayerAttack(dt);
     updateEnemyAttack(dt);
 
-    if (canine && canine->readyToRemove())
+    for (auto it = enemies.begin(); it != enemies.end();)
     {
-        canine->removeFromParent();
-        canine = nullptr;
+        if ((*it)->readyToRemove())
+        {
+            (*it)->removeFromParent();
+            it = enemies.erase(it);
+        }
+        else
+            ++it;
     }
 
     updateCamera(dt);
