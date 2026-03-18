@@ -55,7 +55,9 @@ protected:
 
     Player* target = nullptr;
 
+    bool isAggro = false;
     float aggroRange;
+    float deaggroRange;
     float attackRange;
 
     EnemyState state = EnemyState::Idle;

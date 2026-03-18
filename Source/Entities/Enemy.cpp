@@ -64,6 +64,7 @@ void Enemy::receiveDamage(float amount, int attackID)
     hp = std::max(0.0f, hp - amount);
     state = EnemyState::Hit;
     hitTimer = 1.0f;
+    isAggro  = true;
 
     stopAllActions();
 

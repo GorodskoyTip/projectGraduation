@@ -34,7 +34,7 @@ bool Canine::init()
     }
 
     idleAnim   = createAnimation("wolfBlack", "idle", 0.1f);
-    runAnim    = createAnimation("wolfBlack", "run", 0.05f);
+    runAnim    = createAnimation("wolfBlack", "run", 0.07f);
     fallAnim   = createAnimation("wolfBlack", "idle", 0.1f);
     attackAnim = createAnimation("wolfBlack", "attack", 0.1f);
     hitAnim    = createAnimation("wolfBlack", "hit", 0.035f);
@@ -47,6 +47,7 @@ bool Canine::init()
     }
 
     aggroRange     = 400.f;
+    deaggroRange   = 600.f;
     attackRange    = 40.f;
     attackDamage   = 10;
     attackDuration = attackAnim->getDuration();
@@ -67,18 +68,8 @@ void Canine::handleIdle(float dt)
 void Canine::handleMove(float dt)
 {
     float dx = target->getPositionX() - getPositionX();
-    float dy = std::abs(target->getPositionY() - getPositionY());
 
     constexpr float TURN_THRESHOLD = 10.f;
-    constexpr float HEIGHT_TOLERANCE = 30.f;
-
-    if (dx <= attackRange && dy > HEIGHT_TOLERANCE)
-    {
-        velocity.x = 0;
-        state      = EnemyState::Idle;
-        return;
-    }
-    
     if (std::abs(dx) > TURN_THRESHOLD)
     {
         if (dx > 0)
@@ -94,6 +85,8 @@ void Canine::handleMove(float dt)
             facingRight = true;
         }
     }
+    else
+        velocity.x = 0;
 }
 
 void Canine::handleFall(float dt) {}
@@ -143,21 +136,53 @@ void Canine::updateAI(float dt)
     if (attackCooldown > 0)
         attackCooldown -= dt;
 
-    float dx = std::abs(target->getPositionX() - getPositionX());
-    float dy = std::abs(target->getPositionY() - getPositionY());
+    float dx = target->getPositionX() - getPositionX();
+    float dy = target->getPositionY() - getPositionY();
 
-    constexpr float HEIGHT_TOLERANCE = 30.f;
+    float absDx = std::abs(dx);
+    float absDy = std::abs(dy);
 
-    if (dx > aggroRange)
+    constexpr float HEIGHT_TOLERANCE = 5.f;
+    constexpr float ATTACK_HEIGHT      = 20.f;
+    constexpr float CHASE_HEIGHT_LIMIT = 60.f;
+    constexpr float UNDER_PLAYER_X     = 30.f;
+
+    if (!isAggro && absDx <= aggroRange && absDy <= HEIGHT_TOLERANCE)
+        isAggro = true;
+
+    if (isAggro && absDx > deaggroRange)
     {
-        state = EnemyState::Idle;
+        isAggro = false;
+        state   = EnemyState::Idle;
         return;
     }
 
-    if (dx <= attackRange && dy <= HEIGHT_TOLERANCE)
+    if (!isAggro)
+        return;
+
+    if (absDx <= attackRange && absDy <= ATTACK_HEIGHT)
     {
         if (attackCooldown <= 0)
             startAttack();
+        return;
+    }
+
+    if (dy > 0 && target->isOnGround() && absDx <= UNDER_PLAYER_X)
+    {
+        velocity.x = 0;
+
+        if (dx > 0)
+        {
+            setFlippedX(true);
+            facingRight = false;
+        }
+        else
+        {
+            setFlippedX(false);
+            facingRight = true;
+        }
+
+        state = EnemyState::Idle;
         return;
     }
 
@@ -171,7 +196,7 @@ void Canine::startAttack()
 
     state = EnemyState::Attack;
 
-    attackActive = true;
+    attackActive = false;
     attackTimer  = attackDuration;
 
     attackCooldown = 2.0f;
