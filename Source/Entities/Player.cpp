@@ -364,6 +364,9 @@ void Player::updateAttack(float dt)
         float offsetX = facingRight ? -20.f : 30.f;
 
         hitBox = ax::Rect(pos.x + offsetX - width / 1.5, pos.y - height, width, height);
+
+        float attackMoveSpeed = (state == PlayerState::HeavyAttack) ? 20.f : 20.f;
+        velocity.x            = facingRight ? -attackMoveSpeed : attackMoveSpeed;
     }
     else
         attackActive = false;
@@ -495,7 +498,7 @@ void Player::handleAirMovement(float dt)
 
 void Player::handleAttack(float dt)
 {
-    if (onGround)
+    if (onGround && !attackActive)
         velocity.x = 0;
 
     // Если идёт сама атака
