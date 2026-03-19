@@ -9,6 +9,7 @@
 
 class Player;
 class Enemy;
+class Boss;
 
 struct EnemySpawn
 {
@@ -34,13 +35,21 @@ public:
 
     void updatePlayerAttack(float dt);
     void updateEnemyAttack(float dt);
+    void updateBossAttack(float dt);
 
 private:
     PhysicsSystem physics;
 
+    bool bossFightStarted = false;
+    bool cameraLockActive = false;
+    float cameraTargetX   = 0.f;
+
     Player* player          = nullptr;
     std::vector<EnemySpawn> spawnPoints;
     std::vector<Enemy*> enemies;
+    Boss* boss              = nullptr;
+    ax::Rect bossArena;
+    bool arenaLocked        = false;
     Node* world             = nullptr;
     bool debugPhysics       = false;
     bool debugHurtBox       = false;

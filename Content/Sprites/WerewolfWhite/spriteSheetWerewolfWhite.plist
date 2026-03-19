@@ -4,7 +4,7 @@
   <dict>
     <key>frames</key>
     <dict>
-      <key>Run_2.png</key>
+      <key>werewolfWhite_run_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,0},{116,70}}</string>
@@ -17,7 +17,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Run_1.png</key>
+      <key>werewolfWhite_run_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{116,0},{115,62}}</string>
@@ -30,7 +30,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Run_9.png</key>
+      <key>werewolfWhite_run_9.png</key>
       <dict>
         <key>frame</key>
         <string>{{231,0},{110,47}}</string>
@@ -43,7 +43,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Jump_8.png</key>
+      <key>werewolfWhite_jump_8.png</key>
       <dict>
         <key>frame</key>
         <string>{{341,0},{107,84}}</string>
@@ -56,7 +56,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Run_8.png</key>
+      <key>werewolfWhite_run_8.png</key>
       <dict>
         <key>frame</key>
         <string>{{231,47},{104,51}}</string>
@@ -69,7 +69,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Run_3.png</key>
+      <key>werewolfWhite_run_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{116,62},{103,80}}</string>
@@ -82,7 +82,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Run_7.png</key>
+      <key>werewolfWhite_run_7.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,70},{102,53}}</string>
@@ -95,7 +95,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Run_6.png</key>
+      <key>werewolfWhite_run_6.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,123},{100,63}}</string>
@@ -108,7 +108,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Jump_7.png</key>
+      <key>werewolfWhite_jump_7.png</key>
       <dict>
         <key>frame</key>
         <string>{{448,0},{98,82}}</string>
@@ -121,7 +121,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Jump_1.png</key>
+      <key>werewolfWhite_jump_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{546,0},{98,55}}</string>
@@ -134,7 +134,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack2_3.png</key>
+      <key>werewolfWhite_attack2_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{644,0},{97,83}}</string>
@@ -147,7 +147,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Jump_2.png</key>
+      <key>werewolfWhite_jump_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{546,55},{97,52}}</string>
@@ -160,7 +160,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Jump_9.png</key>
+      <key>werewolfWhite_jump_9.png</key>
       <dict>
         <key>frame</key>
         <string>{{448,82},{95,75}}</string>
@@ -173,7 +173,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Jump_3.png</key>
+      <key>werewolfWhite_jump_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{335,84},{95,63}}</string>
@@ -186,7 +186,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack3_5.png</key>
+      <key>werewolfWhite_attack3_5.png</key>
       <dict>
         <key>frame</key>
         <string>{{335,147},{73,94}}</string>
@@ -199,7 +199,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack3_4.png</key>
+      <key>werewolfWhite_attack3_4.png</key>
       <dict>
         <key>frame</key>
         <string>{{219,98},{92,93}}</string>
@@ -212,7 +212,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Dead_2.png</key>
+      <key>werewolfWhite_dead_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{312,98},{89,22}}</string>
@@ -225,7 +225,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Run_5.png</key>
+      <key>werewolfWhite_run_5.png</key>
       <dict>
         <key>frame</key>
         <string>{{100,142},{93,73}}</string>
@@ -238,7 +238,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Jump_10.png</key>
+      <key>werewolfWhite_jump_10.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,186},{93,60}}</string>
@@ -251,7 +251,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Run_4.png</key>
+      <key>werewolfWhite_run_4.png</key>
       <dict>
         <key>frame</key>
         <string>{{193,190},{92,80}}</string>
@@ -264,7 +264,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Dead_1.png</key>
+      <key>werewolfWhite_dead_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{285,190},{83,50}}</string>
@@ -277,7 +277,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack1_5.png</key>
+      <key>werewolfWhite_attack1_5.png</key>
       <dict>
         <key>frame</key>
         <string>{{93,215},{91,87}}</string>
@@ -290,7 +290,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Jump_11.png</key>
+      <key>werewolfWhite_jump_11.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,246},{90,59}}</string>
@@ -303,7 +303,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack3_1.png</key>
+      <key>werewolfWhite_attack3_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{184,270},{70,89}}</string>
@@ -316,7 +316,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack1_4.png</key>
+      <key>werewolfWhite_attack1_4.png</key>
       <dict>
         <key>frame</key>
         <string>{{90,302},{68,89}}</string>
@@ -329,7 +329,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack3_2.png</key>
+      <key>werewolfWhite_attack3_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,305},{68,89}}</string>
@@ -342,7 +342,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Walk_11.png</key>
+      <key>werewolfWhite_walk_11.png</key>
       <dict>
         <key>frame</key>
         <string>{{741,0},{87,77}}</string>
@@ -355,7 +355,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack1_3.png</key>
+      <key>werewolfWhite_attack1_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{828,0},{77,86}}</string>
@@ -368,7 +368,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack1_1.png</key>
+      <key>werewolfWhite_attack1_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{914,0},{86,75}}</string>
@@ -381,7 +381,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Walk_1.png</key>
+      <key>werewolfWhite_walk_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{1000,0},{86,75}}</string>
@@ -394,7 +394,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack2_1.png</key>
+      <key>werewolfWhite_attack2_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{1086,0},{85,84}}</string>
@@ -407,7 +407,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Jump_6.png</key>
+      <key>werewolfWhite_jump_6.png</key>
       <dict>
         <key>frame</key>
         <string>{{914,75},{85,71}}</string>
@@ -420,7 +420,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack2_2.png</key>
+      <key>werewolfWhite_attack2_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{999,75},{84,84}}</string>
@@ -433,7 +433,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack1_2.png</key>
+      <key>werewolfWhite_attack1_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{741,77},{80,84}}</string>
@@ -446,7 +446,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Walk_2.png</key>
+      <key>werewolfWhite_walk_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{825,77},{84,76}}</string>
@@ -459,7 +459,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack3_3.png</key>
+      <key>werewolfWhite_attack3_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{909,146},{74,84}}</string>
@@ -472,7 +472,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack1_6.png</key>
+      <key>werewolfWhite_attack1_6.png</key>
       <dict>
         <key>frame</key>
         <string>{{825,153},{70,84}}</string>
@@ -485,7 +485,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Attack2_4.png</key>
+      <key>werewolfWhite_attack2_4.png</key>
       <dict>
         <key>frame</key>
         <string>{{643,83},{80,83}}</string>
@@ -498,7 +498,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Walk_3.png</key>
+      <key>werewolfWhite_walk_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{643,163},{83,77}}</string>
@@ -511,7 +511,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Hurt_1.png</key>
+      <key>werewolfWhite_hurt_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{643,240},{83,54}}</string>
@@ -524,7 +524,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Walk_10.png</key>
+      <key>werewolfWhite_walk_10.png</key>
       <dict>
         <key>frame</key>
         <string>{{643,294},{82,78}}</string>
@@ -537,7 +537,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Walk_9.png</key>
+      <key>werewolfWhite_walk_9.png</key>
       <dict>
         <key>frame</key>
         <string>{{726,157},{82,77}}</string>
@@ -550,7 +550,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Hurt_2.png</key>
+      <key>werewolfWhite_hurt_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{726,234},{82,54}}</string>
@@ -563,7 +563,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Walk_4.png</key>
+      <key>werewolfWhite_walk_4.png</key>
       <dict>
         <key>frame</key>
         <string>{{543,107},{81,78}}</string>
@@ -576,7 +576,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Walk_8.png</key>
+      <key>werewolfWhite_walk_8.png</key>
       <dict>
         <key>frame</key>
         <string>{{543,185},{81,76}}</string>
@@ -589,7 +589,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Walk_7.png</key>
+      <key>werewolfWhite_walk_7.png</key>
       <dict>
         <key>frame</key>
         <string>{{429,157},{81,75}}</string>
@@ -602,7 +602,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Jump_4.png</key>
+      <key>werewolfWhite_jump_4.png</key>
       <dict>
         <key>frame</key>
         <string>{{335,220},{81,63}}</string>
@@ -615,7 +615,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Idle_5.png</key>
+      <key>werewolfWhite_idle_5.png</key>
       <dict>
         <key>frame</key>
         <string>{{273,273},{78,58}}</string>
@@ -628,7 +628,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Idle_3.png</key>
+      <key>werewolfWhite_idle_3.png</key>
       <dict>
         <key>frame</key>
         <string>{{273,351},{77,58}}</string>
@@ -641,7 +641,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Walk_5.png</key>
+      <key>werewolfWhite_walk_5.png</key>
       <dict>
         <key>frame</key>
         <string>{{179,340},{80,77}}</string>
@@ -654,7 +654,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Walk_6.png</key>
+      <key>werewolfWhite_walk_6.png</key>
       <dict>
         <key>frame</key>
         <string>{{89,370},{80,76}}</string>
@@ -667,7 +667,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Idle_4.png</key>
+      <key>werewolfWhite_idle_4.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,373},{77,58}}</string>
@@ -680,7 +680,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Idle_6.png</key>
+      <key>werewolfWhite_idle_6.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,431},{77,58}}</string>
@@ -693,7 +693,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Idle_7.png</key>
+      <key>werewolfWhite_idle_7.png</key>
       <dict>
         <key>frame</key>
         <string>{{169,417},{77,58}}</string>
@@ -706,7 +706,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Idle_2.png</key>
+      <key>werewolfWhite_idle_2.png</key>
       <dict>
         <key>frame</key>
         <string>{{77,446},{77,57}}</string>
@@ -719,7 +719,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Idle_8.png</key>
+      <key>werewolfWhite_idle_8.png</key>
       <dict>
         <key>frame</key>
         <string>{{0,489},{77,57}}</string>
@@ -732,7 +732,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Jump_5.png</key>
+      <key>werewolfWhite_jump_5.png</key>
       <dict>
         <key>frame</key>
         <string>{{416,232},{76,76}}</string>
@@ -745,7 +745,7 @@
         <key>sourceSize</key>
         <string>{128,128}</string>
       </dict>
-      <key>Idle_1.png</key>
+      <key>werewolfWhite_idle_1.png</key>
       <dict>
         <key>frame</key>
         <string>{{331,283},{76,57}}</string>
@@ -772,7 +772,7 @@
       <key>size</key>
       <string>{1171,546}</string>
       <key>textureFileName</key>
-      <string>spriteSheetWerewolfWhite</string>
+      <string>spriteSheetWerewolfWhite.png</string>
     </dict>
   </dict>
 </plist>

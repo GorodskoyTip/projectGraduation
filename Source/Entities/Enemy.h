@@ -20,70 +20,70 @@ public:
     virtual bool initBase();
     virtual void update(float dt) override;
 
-    ax::Rect getPhysicsRect() const;
-    void setOnGround(bool value);
-    ax::Vec2 getVelocity();
-    void setVelocityX(float x);
-    void setVelocityY(float y);
-
-    virtual void updateAI(float dt);
     void setTarget(Player* player) { target = player; }
 
-    void setState(EnemyState newState);
-    ax::Animation* createAnimation(const std::string& entity, const std::string& prefix, float delay);
-    virtual void updateAnimation();
+    ax::Rect getPhysicsRect() const;
+    ax::Vec2 getVelocity() { return velocity; }
+    void setVelocityX(float x) { velocity.x = x; }
+    void setVelocityY(float y) { velocity.y = y; }
+    void setOnGround(bool value) { onGround = value; }
 
-    ax::Rect getHurtBox() const;
+    virtual void updateAI(float dt) = 0;
+
     void receiveDamage(float amount, int attackID);
     void onDeath();
     bool isDead() const { return state == EnemyState::Dead; }
+
+    void setState(EnemyState newState);
+    ax::Animation* createAnimation(const std::string& entity, const std::string& prefix, float delay);
+    virtual void updateAnimation() = 0;
+
+    ax::Rect getHurtBox() const;
     bool readyToRemove() const { return state == EnemyState::Dead && deathTimer <= 0.0f; }
 
-    virtual void updateAttack(float dt);
+    virtual void updateAttack(float dt) = 0;
     ax::Rect getHitBox() { return hitBox; }
     bool isAttackActive() { return attackActive; }
     float getAttackDamage() { return attackDamage; }
-    virtual void startAttack();
+    virtual void startAttack() = 0;
 
 protected:
+    Player* target = nullptr;
+
+    EnemyState state = EnemyState::Idle;
+
     EnemyType type;
 
     ax::Vec2 velocity;
-
+    bool onGround    = false;
     bool facingRight = false;
-    bool onGround  = false;
 
-    Player* target = nullptr;
+    float hp;
 
     bool isAggro = false;
     float aggroRange;
     float deaggroRange;
     float attackRange;
 
-    EnemyState state = EnemyState::Idle;
-
-    float hp;
-
-    virtual void handleIdle(float dt);
-    virtual void handleMove(float dt);
-    virtual void handleFall(float dt);
-    virtual void handleAttack(float dt);
-    virtual void handleHit(float dt);
-    virtual void handleDeath(float dt);
-
     float hitTimer           = 0.0f;
     int lastReceivedAttackID = -1;
-    float deathTimer         = 0.0f;
 
     ax::Rect hitBox;
-    bool attackActive = false;
-    float attackTimer = 0.0f;
-    float attackCooldown = 0.0f;
-    float attackDuration = 0.0f;
-
+    bool attackActive       = false;
+    float attackTimer       = 0.0f;
+    float attackCooldown    = 0.0f;
+    float attackDuration    = 0.0f;
     float attackActiveStart = 0.f;
     float attackActiveEnd   = 0.f;
     float attackElapsed     = 0.f;
-
     int attackDamage;
+
+    virtual void handleIdle(float dt)   = 0;
+    virtual void handleMove(float dt)   = 0;
+    virtual void handleFall(float dt)   = 0;
+    virtual void handleAttack(float dt) = 0;
+    virtual void handleHit(float dt)    = 0;
+    virtual void handleDeath(float dt)  = 0;
+
+    float deathTimer = 0.0f;
 };

@@ -1,6 +1,7 @@
 #include "GameScene.h"
 #include "Entities/Player.h"
 #include "Entities/Canine.h"
+#include "Entities/Werewolf.h"
 #include "Core/LevelBounds.h"
 
 #include <iostream>
@@ -51,8 +52,8 @@ bool GameScene::init()
     player->setPosition(200, 240);
     world->addChild(player);
 
-    spawnPoints.push_back({EnemyType::Canine, {400, 240}});
-    spawnPoints.push_back({EnemyType::Canine, {700, 240}});
+    //spawnPoints.push_back({EnemyType::Canine, {400, 240}});
+    //spawnPoints.push_back({EnemyType::Canine, {700, 240}});
 
     for (auto& spawn : spawnPoints)
     {
@@ -71,6 +72,13 @@ bool GameScene::init()
     {
         enemy->setTarget(player);
     }
+
+    bossArena = ax::Rect(1000, 0, 800, 400);
+    boss      = Werewolf::create();
+    boss->setPosition(1400, 240);
+    boss->setTarget(player);
+    boss->setArena(bossArena);
+    world->addChild(boss);
 
     debugDraw = ax::DrawNode::create();
     world->addChild(debugDraw, 999);
@@ -151,6 +159,20 @@ void GameScene::drawDebug()
             }
         }
 
+        if (boss)
+        {
+            auto bossRect     = boss->getPhysicsRect();
+            ax::Vec2 verts[4] = {{bossRect.getMinX(), bossRect.getMinY()},
+                                 {bossRect.getMaxX(), bossRect.getMinY()},
+                                 {bossRect.getMaxX(), bossRect.getMaxY()},
+                                 {bossRect.getMinX(), bossRect.getMaxY()}};
+
+            debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 0, 1, 1));  // ЖЁЛТЫЙ
+
+            auto pos = boss->getPosition();
+            debugDraw->drawDot(pos, 5.0f, ax::Color4F(1, 0, 1, 1));  // ФИОЛЕТОВАЯ
+        }
+
         for (const auto& col : physics.getColliders())
         {
             auto c             = col.rect;
@@ -210,6 +232,18 @@ void GameScene::drawDebug()
                 debugDraw->drawPoly(everts, 4, true, ax::Color4F(0, 1, 1, 1));
             }
         }
+
+        if (boss && boss->isAttackActive())
+        {
+            auto hit = boss->getHitBox();
+
+            ax::Vec2 verts[4] = {{hit.getMinX(), hit.getMinY()},
+                                 {hit.getMaxX(), hit.getMinY()},
+                                 {hit.getMaxX(), hit.getMaxY()},
+                                 {hit.getMinX(), hit.getMaxY()}};
+
+            debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 1, 1, 1));  // ЗЕЛЁНЫЙ
+        }
     }
 }
 
@@ -218,13 +252,23 @@ void GameScene::updatePlayerAttack(float dt)
     for (auto enemy : enemies)
     {
         if (!enemy || enemy->isDead())
-            return;
+            continue;
 
         if (!player->isAttackActive())
-            return;
+            continue;
 
         if (player->getHitBox().intersectsRect(enemy->getHurtBox()))
             enemy->receiveDamage(player->getAttackDamage(player->getAttackType()), player->getAttackID());
+    }
+    if (boss && !boss->isDead())
+    {
+        if (player->isAttackActive())
+        {
+            if (player->getHitBox().intersectsRect(boss->getPhysicsRect()))
+            {
+                boss->receiveDamage(player->getAttackDamage(player->getAttackType()));
+            }
+        }
     }
 }
 
@@ -233,38 +277,74 @@ void GameScene::updateEnemyAttack(float dt)
     for (auto enemy : enemies)
     {
         if (!enemy || enemy->isDead())
-            return;
+            continue;
 
         if (!enemy->isAttackActive())
-            return;
+            continue;
 
         if (enemy->getHitBox().intersectsRect(player->getHurtBox()))
             player->receiveDamage(enemy->getAttackDamage());
     }
 }
 
-void GameScene::updateCamera(float dt)
+void GameScene::updateBossAttack(float dt)
+{
+    if (!boss || boss->isDead())
+        return;
+
+    if (!boss->isAttackActive())
+        return;
+
+    if (boss->getHitBox().intersectsRect(player->getHurtBox()))
     {
+        player->receiveDamage(boss->getAttackDamage());
+    }
+}
+
+void GameScene::updateCamera(float dt)
+{
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
-    float screenCenterX = visibleSize.width * 0.5f;
-    float playerWorldX  = player->getPositionX();
-
-    // 1. цель камеры — держать игрока в центре
-    float targetWorldX = screenCenterX - playerWorldX;
-
-    // 2. ограничение по уровню
-    float minX = visibleSize.width - LEVEL_RIGHT; // правый край
-    float maxX = -LEVEL_LEFT;                     // левый край
-
-    targetWorldX = std::clamp(targetWorldX, minX, maxX);
-
-    // 3. плавность (можно 1.0f для мгновенного следования)
-    constexpr float CAMERA_SPEED = 10.0f;
-
     float currentX = world->getPositionX();
-    float newX = currentX + (targetWorldX - currentX) * CAMERA_SPEED * dt;
+    float targetX;
 
+    if (!bossFightStarted)
+    {
+        // обычная камера за игроком
+        float playerWorldX = player->getPositionX();
+        targetX            = visibleSize.width * 0.5f - playerWorldX;
+    }
+    else if (!cameraLockActive)
+    {
+        // ПЛАВНОЕ ДВИЖЕНИЕ К АРЕНЕ
+        targetX = cameraTargetX;
+
+        float newX = currentX + (targetX - currentX) * 5.0f * dt;
+        world->setPositionX(newX);
+
+        // проверка: дошли ли
+        if (std::abs(newX - cameraTargetX) < 1.0f)
+        {
+            cameraLockActive = true;
+            world->setPositionX(cameraTargetX);
+        }
+
+        return;
+    }
+    else
+    {
+        // УЖЕ ЗАФИКСИРОВАНА
+        world->setPositionX(cameraTargetX);
+        return;
+    }
+
+    // clamp (только для обычной камеры)
+    float minX = visibleSize.width - LEVEL_RIGHT;
+    float maxX = -LEVEL_LEFT;
+
+    targetX = std::clamp(targetX, minX, maxX);
+
+    float newX = currentX + (targetX - currentX) * 10.0f * dt;
     world->setPositionX(newX);
 }
 
@@ -272,6 +352,8 @@ void GameScene::update(float dt)
 {
     if (!world || !player)
         return;
+
+    bool playerInsideArena = bossArena.containsPoint(player->getPosition());
 
     player->update(dt);
     physics.updatePlayer(player, dt);
@@ -282,8 +364,32 @@ void GameScene::update(float dt)
         physics.updateEnemy(enemy, dt);
     }
 
+    if (boss)
+    {
+        boss->update(dt);
+        physics.updateBoss(boss, dt);
+    }
+
     updatePlayerAttack(dt);
     updateEnemyAttack(dt);
+    updateBossAttack(dt);
+
+    if (boss && playerInsideArena && !arenaLocked)
+    {
+        arenaLocked      = true;
+        bossFightStarted = true;
+
+        float wallWidth = 20.f;
+
+        physics.addCollider({ax::Rect(bossArena.getMinX() - wallWidth, 0, wallWidth, 1000), ColliderType::Solid});
+
+        physics.addCollider({ax::Rect(bossArena.getMaxX(), 0, wallWidth, 1000), ColliderType::Solid});
+
+        auto visibleSize   = Director::getInstance()->getVisibleSize();
+        float arenaCenterX = bossArena.getMidX();
+
+        cameraTargetX = visibleSize.width * 0.5f - arenaCenterX;
+    }
 
     for (auto it = enemies.begin(); it != enemies.end();)
     {
@@ -294,6 +400,11 @@ void GameScene::update(float dt)
         }
         else
             ++it;
+    }
+
+    if (boss && boss->isDead())
+    {
+        // можно позже открыть арену или триггерить событие
     }
 
     updateCamera(dt);

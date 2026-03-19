@@ -1,6 +1,7 @@
 #include "PhysicsSystem.h"
 #include "Entities/Player.h"
 #include "Entities/Enemy.h"
+#include "Entities/Boss.h"
 
 void PhysicsSystem::addCollider(const Collider& col) { colliders.push_back(col); }
 const std::vector<Collider>& PhysicsSystem::getColliders() const { return colliders; }
@@ -168,6 +169,95 @@ void PhysicsSystem::enemyMoveAndCollideY(Enemy* enemy, float dt)
     }
 }
 
+void PhysicsSystem::bossMoveAndCollideX(Boss* boss, float dt)
+{
+    auto pos = boss->getPosition();
+    pos.x += boss->getVelocity().x * dt;
+    boss->setPosition(pos);
+
+    for (const auto& col : colliders)
+    {
+        auto rectX = boss->getPhysicsRect();
+
+        if (col.type != ColliderType::Solid)
+            continue;
+
+        if (!rectX.intersectsRect(col.rect))
+            continue;
+
+        if (boss->getVelocity().x > 0)
+        {
+            float penetration = rectX.getMaxX() - col.rect.getMinX();
+            pos.x -= penetration;
+        }
+        else if (boss->getVelocity().x < 0)
+        {
+            float penetration = col.rect.getMaxX() - rectX.getMinX();
+            pos.x += penetration;
+        }
+
+        boss->setPosition(pos);
+        boss->setVelocityX(0);
+        break;
+    }
+}
+
+void PhysicsSystem::bossMoveAndCollideY(Boss* boss, float dt)
+{
+    auto pos        = boss->getPosition();
+    float velocityY = boss->getVelocity().y;
+
+    float prevY = pos.y;
+
+    pos.y += velocityY * dt;
+    boss->setPosition(pos);
+
+    boss->setOnGround(false);
+
+    for (const auto& col : colliders)
+    {
+        if (col.type != ColliderType::Solid)
+            continue;
+
+        float platformTop = col.rect.getMaxY();
+
+        float prevBottom    = prevY;
+        float currentBottom = pos.y;
+
+        // ✅ ПАДЕНИЕ — ОСНОВНОЙ КЕЙС
+        if (velocityY < 0)
+        {
+            if (prevBottom >= platformTop && currentBottom <= platformTop)
+            {
+                pos.y = platformTop;
+
+                boss->setPosition(pos);
+                boss->setVelocityY(0);
+                boss->setOnGround(true);
+
+                return;  // важно!
+            }
+        }
+
+        // (опционально) удар головой
+        else if (velocityY > 0)
+        {
+            float platformBottom = col.rect.getMinY();
+            float currentTop     = pos.y + boss->getPhysicsRect().size.height;
+
+            if (currentTop >= platformBottom && prevY + boss->getPhysicsRect().size.height <= platformBottom)
+            {
+                pos.y = platformBottom - boss->getPhysicsRect().size.height;
+
+                boss->setPosition(pos);
+                boss->setVelocityY(0);
+
+                return;
+            }
+        }
+    }
+}
+
 bool PhysicsSystem::hasGroundBelow(const ax::Vec2& point) const
 {
     ax::Rect probe(point.x - 2, point.y - 2, 4, 4);
@@ -184,6 +274,21 @@ bool PhysicsSystem::hasGroundBelow(const ax::Vec2& point) const
     return false;
 }
 
+bool PhysicsSystem::hasWallAhead(const ax::Rect& rect, float dir) const
+{
+    float checkX = (dir > 0) ? rect.getMaxX() + 2 : rect.getMinX() - 2;
+
+    ax::Rect probe(checkX, rect.getMinY(), 2, rect.size.height);
+
+    for (const auto& col : colliders)
+    {
+        if (col.type == ColliderType::Solid && probe.intersectsRect(col.rect))
+            return true;
+    }
+
+    return false;
+}
+
 void PhysicsSystem::updatePlayer(Player* player, float dt)
 {
     playerMoveAndCollideX(player, dt);
@@ -194,4 +299,10 @@ void PhysicsSystem::updateEnemy(Enemy* enemy, float dt)
 {
     enemyMoveAndCollideX(enemy, dt);
     enemyMoveAndCollideY(enemy, dt);
+}
+
+void PhysicsSystem::updateBoss(Boss* boss, float dt)
+{
+    bossMoveAndCollideX(boss, dt);
+    bossMoveAndCollideY(boss, dt);
 }

@@ -29,31 +29,6 @@ ax::Rect Enemy::getHurtBox() const
     return Rect(pos.x - W / 2, pos.y - H / 2, W, H);
 }
 
-ax::Vec2 Enemy::getVelocity() {return velocity;}
-
-void Enemy::setOnGround(bool value) {onGround = value;}
-
-void Enemy::setVelocityX(float x) {velocity.x = x;}
-
-void Enemy::setVelocityY(float y) {velocity.y = y;}
-
-void Enemy::handleIdle(float dt) {}
-
-void Enemy::handleMove(float dt) {}
-
-void Enemy::handleFall(float dt) {}
-
-void Enemy::handleAttack(float dt) {}
-
-void Enemy::handleHit(float dt) {}
-
-void Enemy::handleDeath(float dt) {}
-
-void Enemy::updateAI(float dt) {}
-
-void Enemy::startAttack() {}
-void Enemy::updateAttack(float dt) {}
-
 void Enemy::receiveDamage(float amount, int attackID)
 {
     if (lastReceivedAttackID == attackID)
@@ -114,8 +89,6 @@ ax::Animation* Enemy::createAnimation(const std::string& entity, const std::stri
     animation->retain();
     return animation;
 }
-
-void Enemy::updateAnimation() {}
 
 void Enemy::update(float dt)
 {
