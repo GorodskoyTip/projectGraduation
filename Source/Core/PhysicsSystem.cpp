@@ -179,7 +179,7 @@ void PhysicsSystem::bossMoveAndCollideX(Boss* boss, float dt)
     {
         auto rectX = boss->getPhysicsRect();
 
-        if (col.type != ColliderType::Solid)
+        if (col.rect.size.height < 200)
             continue;
 
         if (!rectX.intersectsRect(col.rect))
@@ -204,55 +204,48 @@ void PhysicsSystem::bossMoveAndCollideX(Boss* boss, float dt)
 
 void PhysicsSystem::bossMoveAndCollideY(Boss* boss, float dt)
 {
-    auto pos        = boss->getPosition();
-    float velocityY = boss->getVelocity().y;
-
-    float prevY = pos.y;
-
-    pos.y += velocityY * dt;
+    auto pos = boss->getPosition();
+    pos.y += boss->getVelocity().y * dt;
     boss->setPosition(pos);
 
     boss->setOnGround(false);
 
     for (const auto& col : colliders)
     {
-        if (col.type != ColliderType::Solid)
+        auto rectY = boss->getPhysicsRect();
+
+        if (!rectY.intersectsRect(col.rect))
             continue;
 
-        float platformTop = col.rect.getMaxY();
-
-        float prevBottom    = prevY;
-        float currentBottom = pos.y;
-
-        // ✅ ПАДЕНИЕ — ОСНОВНОЙ КЕЙС
-        if (velocityY < 0)
+        if (col.type == ColliderType::OneWay)
         {
-            if (prevBottom >= platformTop && currentBottom <= platformTop)
+            if (boss->getVelocity().y >= 0)
+                continue;
+
+            float prevBottom  = rectY.getMinY() - boss->getVelocity().y * dt;
+            float platformTop = col.rect.getMaxY();
+
+            if (prevBottom < platformTop)
+                continue;
+
+            float penetration = platformTop - rectY.getMinY();
+            pos.y += penetration;
+
+            boss->setPosition(pos);
+            boss->setVelocityY(0);
+            boss->setOnGround(true);
+        }
+        else if (col.type == ColliderType::Solid)
+        {
+
+            if (boss->getVelocity().y < 0)
             {
-                pos.y = platformTop;
+                float penetration = col.rect.getMaxY() - rectY.getMinY();
+                pos.y += penetration;
 
                 boss->setPosition(pos);
                 boss->setVelocityY(0);
                 boss->setOnGround(true);
-
-                return;  // важно!
-            }
-        }
-
-        // (опционально) удар головой
-        else if (velocityY > 0)
-        {
-            float platformBottom = col.rect.getMinY();
-            float currentTop     = pos.y + boss->getPhysicsRect().size.height;
-
-            if (currentTop >= platformBottom && prevY + boss->getPhysicsRect().size.height <= platformBottom)
-            {
-                pos.y = platformBottom - boss->getPhysicsRect().size.height;
-
-                boss->setPosition(pos);
-                boss->setVelocityY(0);
-
-                return;
             }
         }
     }

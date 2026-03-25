@@ -151,11 +151,11 @@ void Player::onExit()
 
 ax::Rect Player::getPhysicsRect() const
 {
-    constexpr float PHYS_WIDTH  = 25.0f;
-    constexpr float PHYS_HEIGHT = 30.0f;
+    constexpr float W  = 25.0f;
+    constexpr float H = 30.0f;
 
     auto pos = getPosition();
-    return ax::Rect(pos.x - PHYS_WIDTH / 2, pos.y - PHYS_HEIGHT, PHYS_WIDTH, PHYS_HEIGHT);
+    return ax::Rect(pos.x - W / 2, pos.y - H, W, H);
 }
 
 void Player::setOnGround(bool value)
@@ -420,11 +420,11 @@ void Player::onDeath()
 
 ax::Rect Player::getHurtBox() const
 {
-    constexpr float HURT_WIDTH  = 20.0f;
-    constexpr float HURT_HEIGHT = 25.0f;
+    constexpr float W = 20.0f;
+    constexpr float H = 25.0f;
 
     auto pos = getPosition();
-    return ax::Rect(pos.x - HURT_WIDTH / 2, pos.y - HURT_HEIGHT, HURT_WIDTH, HURT_HEIGHT);
+    return ax::Rect(pos.x - W / 2, pos.y - H, W, H);
 }
 
 void Player::handleIdle(float dt)

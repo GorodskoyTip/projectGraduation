@@ -32,6 +32,7 @@ bool Canine::init()
         AXLOG("ENEMY SPRITE NOT LOADED");
         return false;
     }
+    setAnchorPoint(ax::Vec2(0.5f, 0.5f));
 
     idleAnim   = createAnimation("wolfBlack", "idle", 0.1f);
     runAnim    = createAnimation("wolfBlack", "run", 0.07f);

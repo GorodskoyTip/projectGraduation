@@ -32,6 +32,7 @@ public:
     virtual void onExit() override;
 
     void drawDebug();
+    void updateFreeCamera(float dt);
 
     void updatePlayerAttack(float dt);
     void updateEnemyAttack(float dt);
@@ -55,4 +56,12 @@ private:
     bool debugHurtBox       = false;
     bool debugHitBox        = false;
     ax::DrawNode* debugDraw = nullptr;
+
+    bool freeCamera         = false;
+    ax::Vec2 freeCamPos;
+    float freeCamSpeed      = 600.0f;
+    bool camUp         = false;
+    bool camDown       = false;
+    bool camLeft       = false;
+    bool camRight      = false;
 };

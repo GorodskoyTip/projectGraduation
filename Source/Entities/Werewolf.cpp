@@ -32,7 +32,7 @@ bool Werewolf::init()
         AXLOG("WEREWOLF SPRITE NOT LOADED");
         return false;
     }
-    setAnchorPoint(ax::Vec2(0.5f, 0.0f));
+    setAnchorPoint(ax::Vec2(0.5f, 0.5f));
 
     idleAnim = createAnimation("werewolfWhite", "idle", 0.1f);
     runAnim  = createAnimation("werewolfWhite", "run", 0.07f);
@@ -249,7 +249,7 @@ void Werewolf::updateAttack(float dt)
         auto pos      = getPosition();
         float offsetX = facingRight ? -30.f : 30.f;
 
-        hitBox = ax::Rect(pos.x + offsetX - width / 2, pos.y - height / 2, width, height);
+        hitBox = ax::Rect(pos.x + offsetX - width / 2, pos.y - height, width, height);
     }
     else
         attackActive = false;

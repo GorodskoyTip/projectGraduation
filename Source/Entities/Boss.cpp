@@ -19,12 +19,12 @@ void Boss::setArena(const ax::Rect& rect)
 
 ax::Rect Boss::getPhysicsRect() const
 {
-    constexpr float W = 40;
-    constexpr float H = 50;
+    constexpr float W = 60;
+    constexpr float H = 60;
 
     auto pos = getPosition();
 
-    return ax::Rect(pos.x - W / 2, pos.y, W, H);
+    return ax::Rect(pos.x - W / 2, pos.y - H, W, H);
 }
 
 void Boss::receiveDamage(float amount)
@@ -92,7 +92,7 @@ void Boss::update(float dt)
     if (attackCooldown > 0)
         attackCooldown -= dt;
 
-    updateAI(dt);
+    //updateAI(dt);
 
     switch (state)
     {

@@ -75,7 +75,7 @@ bool GameScene::init()
 
     bossArena = ax::Rect(1000, 0, 800, 400);
     boss      = Werewolf::create();
-    boss->setPosition(1400, 240);
+    boss->setPosition(1400, 200);
     boss->setTarget(player);
     boss->setArena(bossArena);
     world->addChild(boss);
@@ -109,6 +109,35 @@ void GameScene::onEnter()
             debugHitBox = !debugHitBox;
             AXLOG("Hitbox debug toggled: %d", debugHitBox);
         }
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_F4)
+        {
+            freeCamera = !freeCamera;
+
+            // при включении — запоминаем текущую позицию
+            if (freeCamera)
+                freeCamPos = world->getPosition();
+
+            AXLOG("Free camera: %d", freeCamera);
+        }
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_W)
+            camUp = true;
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_S)
+            camDown = true;
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_A)
+            camLeft = true;
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_D)
+            camRight = true;
+    };
+
+    listener->onKeyReleased = [this](ax::EventKeyboard::KeyCode keyCode, ax::Event*) {
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_W)
+            camUp = false;
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_S)
+            camDown = false;
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_A)
+            camLeft = false;
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_D)
+            camRight = false;
     };
 
     _eventDispatcher->addEventListenerWithFixedPriority(listener, 1);
@@ -144,6 +173,9 @@ void GameScene::drawDebug()
                                    {playerPhysRect.getMaxX(), playerPhysRect.getMaxY()},
                                    {playerPhysRect.getMinX(), playerPhysRect.getMaxY()}};
             debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 0, 1, 1));
+
+            auto pos = player->getPosition();
+            debugDraw->drawDot(pos, 5.0f, ax::Color4F(1, 0, 1, 1));
         }
 
         for (auto enemy : enemies)
@@ -245,6 +277,31 @@ void GameScene::drawDebug()
             debugDraw->drawPoly(verts, 4, true, ax::Color4F(0, 1, 1, 1));  // ЗЕЛЁНЫЙ
         }
     }
+}
+
+void GameScene::updateFreeCamera(float dt)
+{
+    if (!freeCamera)
+        return;
+
+    ax::Vec2 dir = ax::Vec2::ZERO;
+
+    if (camUp)
+        dir.y += 1;
+    if (camDown)
+        dir.y -= 1;
+    if (camLeft)
+        dir.x -= 1;
+    if (camRight)
+        dir.x += 1;
+
+    if (dir != ax::Vec2::ZERO)
+    {
+        dir.normalize();
+        freeCamPos += dir * freeCamSpeed * dt;
+    }
+
+    world->setPosition(freeCamPos);
 }
 
 void GameScene::updatePlayerAttack(float dt)
@@ -352,6 +409,13 @@ void GameScene::update(float dt)
 {
     if (!world || !player)
         return;
+
+    if (freeCamera)
+    {
+        updateFreeCamera(dt);
+        drawDebug();
+        return;  // 🔥 отключаем всё остальное
+    }
 
     bool playerInsideArena = bossArena.containsPoint(player->getPosition());
 

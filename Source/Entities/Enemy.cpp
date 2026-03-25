@@ -17,7 +17,7 @@ ax::Rect Enemy::getPhysicsRect() const
     constexpr float H = 30;
 
     auto pos = getPosition();
-    return Rect(pos.x - W / 2, pos.y - H / 2, W, H);
+    return Rect(pos.x - W / 2, pos.y - H, W, H);
 }
 
 ax::Rect Enemy::getHurtBox() const
@@ -26,7 +26,7 @@ ax::Rect Enemy::getHurtBox() const
     constexpr float H = 30;
 
     auto pos = getPosition();
-    return Rect(pos.x - W / 2, pos.y - H / 2, W, H);
+    return Rect(pos.x - W / 2, pos.y - H, W, H);
 }
 
 void Enemy::receiveDamage(float amount, int attackID)
