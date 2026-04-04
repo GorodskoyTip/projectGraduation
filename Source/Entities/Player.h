@@ -1,6 +1,6 @@
 #pragma once
 #include "axmol.h"
-#include "Core/CollisionResolver.h"
+#include "Core/PhysicsEntity.h"
 
 enum class PlayerState
 {
@@ -14,7 +14,7 @@ enum class PlayerState
     Dead
 };
 
-class Player : public ax::Sprite
+class Player : public PhysicsEntity
 {
 public:
     static Player* create();
@@ -26,12 +26,7 @@ public:
     virtual void onEnter() override;
     virtual void onExit() override;
 
-    ax::Rect getPhysicsRect() const;
-    void setOnGround(bool value);
-    bool isOnGround() const;
-    ax::Vec2 getVelocity();
-    void setVelocityX(float x);
-    void setVelocityY(float y);
+    ax::Rect getPhysicsRect() const override;
 
     PlayerState getState() const { return state; }
     void updateAnimation();
@@ -54,11 +49,9 @@ public:
 private:
     PlayerState state = PlayerState::Idle;
     bool jumpFromRun  = false;
-    ax::Vec2 velocity;
 
     bool moveLeft  = false;
     bool moveRight = false;
-    bool onGround  = false;
 
     void handleIdle(float dt);
     void handleRun(float dt);

@@ -3,11 +3,12 @@
 
 USING_NS_AX;
 
-static constexpr float GRAVITY = -900.f;
+static constexpr float GRAVITY = 900.f;
 
 bool Boss::initBase()
 {
-    velocity = ax::Vec2::ZERO;
+    setVelocityX(0);
+    setVelocityY(0);
     state    = BossState::Idle;
     return true;
 }
@@ -37,7 +38,8 @@ void Boss::receiveDamage(float amount)
     if (hp <= 0)
     {
         state      = BossState::Dead;
-        velocity   = ax::Vec2::ZERO;
+        setVelocityX(0);
+        setVelocityY(0);
         deathTimer = 2.0f;
     }
     else
@@ -118,10 +120,7 @@ void Boss::update(float dt)
     updateAttack(dt);
     updateAnimation();
 
-    if (!onGround)
-        velocity.y += GRAVITY * dt;
-
-    velocity.y = std::max(velocity.y, -1500.f);
+    setVelocityY(getVelocity().y - GRAVITY * dt);
 
     static float logTimer = 0.f;
     logTimer += dt;

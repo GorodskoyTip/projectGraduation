@@ -6,7 +6,8 @@ static constexpr float GRAVITY    = -900.0f;
 
 bool Enemy::initBase()
 {
-    velocity = Vec2::ZERO;
+    setVelocityX(0);
+    setVelocityY(0);
     state    = EnemyState::Idle;
     return true;
 }
@@ -55,7 +56,8 @@ void Enemy::onDeath()
 
     attackActive = false;
     attackTimer  = 0;
-    velocity     = ax::Vec2::ZERO;
+    setVelocityX(0);
+    setVelocityY(0);
 
     deathTimer = 2.0f;
 
@@ -124,5 +126,5 @@ void Enemy::update(float dt)
     updateAnimation();
     updateAttack(dt);
 
-    velocity.y += GRAVITY * dt;
+    setVelocityY(getVelocity().y - GRAVITY * dt);
 }

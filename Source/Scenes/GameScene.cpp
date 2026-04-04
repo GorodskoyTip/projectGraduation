@@ -420,19 +420,16 @@ void GameScene::update(float dt)
     bool playerInsideArena = bossArena.containsPoint(player->getPosition());
 
     player->update(dt);
-    physics.updatePlayer(player, dt);
+    physics.updatePhysics(player, dt);
 
     for (auto enemy : enemies)
     {
         enemy->update(dt);
-        physics.updateEnemy(enemy, dt);
+        physics.updatePhysics(enemy, dt);
     }
 
-    if (boss)
-    {
-        boss->update(dt);
-        physics.updateBoss(boss, dt);
-    }
+    boss->update(dt);
+    physics.updatePhysics(boss, dt);
 
     updatePlayerAttack(dt);
     updateEnemyAttack(dt);

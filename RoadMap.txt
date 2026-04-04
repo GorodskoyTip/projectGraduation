@@ -1,1 +1,10 @@
-- Fix Enemy ReceiveDamage to receive damage only once per hit
+- Refactor (unify, if possible) coordinates system
+- Refactor Physics to universal function
+- Fix the bug, where the Arena appears in front of the Player
+- Move arena starting code to a function
+- Redo Werewolf AI for:
+  When the Player is far away, Werewolf rushes towards them
+  When the Player is close, Werewolf walks
+  When the Player is above the Werewolf, Werewolf jumps
+  
+- Refactor Enemy for cleaning up

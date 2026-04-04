@@ -9,7 +9,7 @@ static constexpr float AIR_MOVE_SPEED    = 80.0f;
 static constexpr float AIR_MOVE_FROM_RUN = 200.0f;
 static constexpr float AIR_ACCEL         = 600.0f;
 static constexpr float JUMP_SPEED        = 420.0f;
-static constexpr float GRAVITY           = -900.0f;
+static constexpr float GRAVITY           = 900.0f;
 
 Player* Player::create()
 {
@@ -52,7 +52,8 @@ bool Player::init()
         return false;
     }
     
-    velocity = Vec2::ZERO;
+    setVelocityX(0);
+    setVelocityY(0);
 
     AXLOG("PLAYER INIT OK");
     return true;
@@ -80,10 +81,10 @@ void Player::onKeyPressed(EventKeyboard::KeyCode key, Event*)
 
     if (key == EventKeyboard::KeyCode::KEY_SPACE)
     {
-        if (onGround && (state == PlayerState::Idle || state == PlayerState::Run))
+        if (isOnGround() && (state == PlayerState::Idle || state == PlayerState::Run))
         {
-            velocity.y = JUMP_SPEED;
-            onGround   = false;
+            setVelocityY(JUMP_SPEED);
+            setOnGround(false);
 
             jumpFromRun = (state == PlayerState::Run);
             state       = PlayerState::Jump;
@@ -151,36 +152,12 @@ void Player::onExit()
 
 ax::Rect Player::getPhysicsRect() const
 {
-    constexpr float W  = 25.0f;
+    constexpr float W = 25.0f;
     constexpr float H = 30.0f;
 
     auto pos = getPosition();
+
     return ax::Rect(pos.x - W / 2, pos.y - H, W, H);
-}
-
-void Player::setOnGround(bool value)
-{
-    onGround = value;
-}
-
-bool Player::isOnGround() const
-{
-    return onGround;
-}
-
-ax::Vec2 Player::getVelocity()
-{
-    return velocity;
-}
-
-void Player::setVelocityX(float x)
-{
-    velocity.x = x;
-}
-
-void Player::setVelocityY(float y)
-{
-    velocity.y = y;
 }
 
 void Player::updateAnimation()
@@ -366,7 +343,7 @@ void Player::updateAttack(float dt)
         hitBox = ax::Rect(pos.x + offsetX - width / 1.5, pos.y - height, width, height);
 
         float attackMoveSpeed = (state == PlayerState::HeavyAttack) ? 20.f : 20.f;
-        velocity.x            = facingRight ? -attackMoveSpeed : attackMoveSpeed;
+        setVelocityX(facingRight ? -attackMoveSpeed : attackMoveSpeed);
     }
     else
         attackActive = false;
@@ -407,7 +384,8 @@ void Player::onDeath()
 {
     state = PlayerState::Dead;
 
-    velocity = ax::Vec2::ZERO;
+    setVelocityX(0);
+    setVelocityY(0);
 
     attackActive = false;
     comboQueued  = false;
@@ -429,28 +407,28 @@ ax::Rect Player::getHurtBox() const
 
 void Player::handleIdle(float dt)
 {
-    velocity.x = 0;
+    setVelocityX(0);
 
     if (moveLeft || moveRight)
         state = PlayerState::Run;
 
-    if (!onGround)
+    if (!isOnGround())
         state = PlayerState::Fall;
 }
 
 void Player::handleRun(float dt)
 {
     if (moveLeft)
-        velocity.x = -MOVE_SPEED;
+        setVelocityX(-MOVE_SPEED);
     else if (moveRight)
-        velocity.x = MOVE_SPEED;
+        setVelocityX(MOVE_SPEED);
     else
     {
-        velocity.x = 0;
+        setVelocityX(0);
         state      = PlayerState::Idle;
     }
 
-    if (!onGround)
+    if (!isOnGround())
     {
         jumpFromRun = true;
         state       = PlayerState::Fall;
@@ -461,7 +439,7 @@ void Player::handleJump(float dt)
 {
     handleAirMovement(dt);
 
-    if (velocity.y <= 0)
+    if (getVelocity().y <= 0)
         state = PlayerState::Fall;
 }
 
@@ -469,7 +447,7 @@ void Player::handleFall(float dt)
 {
     handleAirMovement(dt);
 
-    if (onGround)
+    if (isOnGround())
     {
         jumpFromRun = false;
         state       = PlayerState::Idle;
@@ -481,25 +459,28 @@ void Player::handleAirMovement(float dt)
     if (!jumpFromRun)
     {
         if (moveLeft)
-            velocity.x = -AIR_MOVE_SPEED;
+            setVelocityX(-AIR_MOVE_SPEED);
         else if (moveRight)
-            velocity.x = AIR_MOVE_SPEED;
+            setVelocityX(AIR_MOVE_SPEED);
     }
     else
     {
-        if (moveLeft)
-            velocity.x -= AIR_ACCEL * dt;
-        else if (moveRight)
-            velocity.x += AIR_ACCEL * dt;
+        float vx = getVelocity().x;
 
-        velocity.x = std::clamp(velocity.x, -AIR_MOVE_FROM_RUN, AIR_MOVE_FROM_RUN);
+        if (moveLeft)
+            vx -= AIR_ACCEL * dt;
+        else if (moveRight)
+            vx += AIR_ACCEL * dt;
+
+        vx = std::clamp(vx, -AIR_MOVE_FROM_RUN, AIR_MOVE_FROM_RUN);
+        setVelocityX(vx);
     }
 }
 
 void Player::handleAttack(float dt)
 {
-    if (onGround && !attackActive)
-        velocity.x = 0;
+    if (isOnGround() && !attackActive)
+        setVelocityX(0);
 
     // Если идёт сама атака
     if (!inRecovery)
@@ -543,7 +524,7 @@ void Player::handleAttack(float dt)
             comboQueued = false;
             comboIndex  = 0;
 
-            if (!onGround)
+            if (!isOnGround())
                 state = PlayerState::Fall;
             else if (moveLeft || moveRight)
                 state = PlayerState::Run;
@@ -555,14 +536,14 @@ void Player::handleAttack(float dt)
 
 void Player::handleHit(float dt)
 {
-    if (onGround)
-        velocity.x = 0;
+    if (isOnGround())
+        setVelocityX(0);
 
     hitTimer -= dt;
 
     if (hitTimer <= 0)
     {
-        if (!onGround)
+        if (!isOnGround())
             state = PlayerState::Fall;
         else if (moveLeft || moveRight)
             state = PlayerState::Run;
@@ -573,20 +554,20 @@ void Player::handleHit(float dt)
 
 void Player::handleDead(float dt)
 {
-    velocity.x = 0;
+    setVelocityX(0);
     deathTimer -= dt;
 }
 
 void Player::updateFacingDirection()
 {
-    if (velocity.x < 0.0f && !facingRight)
+    if (getVelocity().x < 0.0f && !facingRight)
     {
         setFlippedX(false);
         facingRight = true;
     }
 
     // Если движемся влево
-    else if (velocity.x > 0.0f && facingRight)
+    else if (getVelocity().x > 0.0f && facingRight)
     {
         setFlippedX(true);
         facingRight = false;
@@ -635,5 +616,6 @@ void Player::update(float dt)
         isInvincible = false;
     }
 
-    velocity.y += GRAVITY * dt;
+    setVelocityY(getVelocity().y - GRAVITY * dt);
+
 }

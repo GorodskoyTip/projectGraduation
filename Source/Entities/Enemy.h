@@ -1,6 +1,7 @@
 #pragma once
 #include "axmol.h"
 #include "Entities/EnemyTypes.h"
+#include "Core/PhysicsEntity.h"
 
 enum class EnemyState
 {
@@ -14,7 +15,7 @@ enum class EnemyState
 
 class Player;
 
-class Enemy : public ax::Sprite
+class Enemy : public PhysicsEntity
 {
 public:
     virtual bool initBase();
@@ -22,11 +23,7 @@ public:
 
     void setTarget(Player* player) { target = player; }
 
-    ax::Rect getPhysicsRect() const;
-    ax::Vec2 getVelocity() { return velocity; }
-    void setVelocityX(float x) { velocity.x = x; }
-    void setVelocityY(float y) { velocity.y = y; }
-    void setOnGround(bool value) { onGround = value; }
+    ax::Rect getPhysicsRect() const override;
 
     virtual void updateAI(float dt) = 0;
 

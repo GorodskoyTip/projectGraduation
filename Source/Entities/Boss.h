@@ -1,5 +1,6 @@
 #pragma once
 #include "axmol.h"
+#include "Core/PhysicsEntity.h"
 
 class Player;
 
@@ -13,7 +14,7 @@ enum class BossState
     Dead
 };
 
-class Boss : public ax::Sprite
+class Boss : public PhysicsEntity
 {
 public:
     virtual bool initBase();
@@ -21,11 +22,7 @@ public:
 
     void setTarget(Player* p) { target = p; }
 
-    ax::Rect getPhysicsRect() const;
-    ax::Vec2 getVelocity() const { return velocity; }
-    void setVelocityX(float x) { velocity.x = x; }
-    void setVelocityY(float y) { velocity.y = y; }
-    void setOnGround(bool v) { onGround = v; }
+    ax::Rect getPhysicsRect() const override;
 
     void setArena(const ax::Rect& rect);
     bool isFightStarted() const { return fightStarted; }
@@ -41,9 +38,6 @@ protected:
     Player* target = nullptr;
 
     BossState state = BossState::Idle;
-
-    ax::Vec2 velocity;
-    bool onGround = false;
 
     float hp = 300;
 
