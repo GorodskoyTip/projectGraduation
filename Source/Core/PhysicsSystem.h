@@ -7,6 +7,7 @@ class PhysicsSystem
 {
 public:
     void addCollider(const Collider& col);
+    void removeCollider(const Collider& col);
     bool hasGroundBelow(const ax::Vec2& point) const;
     bool hasWallAhead(const ax::Rect& rect, float dir) const;
     void updatePhysics(PhysicsEntity* body, float dt);
@@ -18,4 +19,6 @@ private:
 
     void moveAndCollideX(PhysicsEntity* body, float dt);
     void moveAndCollideY(PhysicsEntity* body, float dt);
+
+    int nextColliderID = 1;
 };

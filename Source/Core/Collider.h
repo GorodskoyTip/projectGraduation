@@ -12,6 +12,7 @@ struct Collider
 {
     ax::Rect rect;
     ColliderType type;
+    int id = 0;
 
     Collider(const ax::Rect& r, ColliderType t) : rect(r), type(t) {}
 

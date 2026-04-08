@@ -38,6 +38,10 @@ public:
     void updateEnemyAttack(float dt);
     void updateBossAttack(float dt);
 
+    bool isBossFightTriggered() const;
+    void startBossFight();
+    void endBossFight();
+
 private:
     PhysicsSystem physics;
 
@@ -64,4 +68,7 @@ private:
     bool camDown       = false;
     bool camLeft       = false;
     bool camRight      = false;
+
+    std::vector<Collider> arenaColliders;
+    bool exitingBossFight = false;
 };

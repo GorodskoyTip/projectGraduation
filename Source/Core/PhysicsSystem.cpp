@@ -6,6 +6,13 @@
 void PhysicsSystem::addCollider(const Collider& col) { colliders.push_back(col); }
 const std::vector<Collider>& PhysicsSystem::getColliders() const { return colliders; }
 
+void PhysicsSystem::removeCollider(const Collider& col)
+{
+    colliders.erase(std::remove_if(colliders.begin(), colliders.end(),
+                                   [&](const Collider& c) { return c.type == col.type && c.rect.equals(col.rect); }),
+                    colliders.end());
+}
+
 bool PhysicsSystem::hasGroundBelow(const ax::Vec2& point) const
 {
     ax::Rect probe(point.x - 2, point.y - 2, 4, 4);

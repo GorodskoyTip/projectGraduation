@@ -1,6 +1,6 @@
-- Refactor (unify, if possible) coordinates system
-- Refactor Physics to universal function
-- Fix the bug, where the Arena appears in front of the Player
+- Refactor (unify, if possible) coordinates system  -
+- Refactor Physics to universal function -
+- Fix the bug, where the Arena appears in front of the Player and finish arena functionality
 - Move arena starting code to a function
 - Redo Werewolf AI for:
   When the Player is far away, Werewolf rushes towards them

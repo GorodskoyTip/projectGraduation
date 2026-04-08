@@ -75,7 +75,7 @@ bool GameScene::init()
 
     bossArena = ax::Rect(1000, 0, 800, 400);
     boss      = Werewolf::create();
-    boss->setPosition(1400, 200);
+    boss->setPosition(1800, 200);
     boss->setTarget(player);
     boss->setArena(bossArena);
     world->addChild(boss);
@@ -327,6 +327,11 @@ void GameScene::updatePlayerAttack(float dt)
             }
         }
     }
+    if (boss->isDead())
+    {
+        exitingBossFight = true;
+        cameraLockActive = false;
+    }
 }
 
 void GameScene::updateEnemyAttack(float dt)
@@ -358,28 +363,88 @@ void GameScene::updateBossAttack(float dt)
     }
 }
 
+bool GameScene::isBossFightTriggered() const
+{
+    ax::Rect bossTriggerZone = ax::Rect(bossArena.getMidX() - 100, bossArena.getMinY(), 200, bossArena.size.height);
+    return bossTriggerZone.containsPoint(player->getPosition());
+}
+
+void GameScene::startBossFight()
+{
+    arenaLocked      = true;
+    bossFightStarted = true;
+
+    float wallWidth = 20.f;
+
+    Collider leftWall  = {ax::Rect(bossArena.getMinX() - wallWidth, 0, wallWidth, 1000), ColliderType::Solid};
+    Collider rightWall = {ax::Rect(bossArena.getMaxX(), 0, wallWidth, 1000), ColliderType::Solid};
+
+    physics.addCollider(leftWall);
+    physics.addCollider(rightWall);
+
+    arenaColliders.push_back(leftWall);
+    arenaColliders.push_back(rightWall);
+
+    auto visibleSize   = ax::Director::getInstance()->getVisibleSize();
+    float arenaCenterX = bossArena.getMidX();
+
+    cameraTargetX = visibleSize.width * 0.5f - arenaCenterX;
+}
+
+void GameScene::endBossFight()
+{
+    arenaLocked      = false;
+    bossFightStarted = false;
+    cameraLockActive = false;
+
+    for (auto& col : arenaColliders)
+    {
+        physics.removeCollider(col);
+    }
+
+    arenaColliders.clear();
+
+    exitingBossFight = true;
+}
+
 void GameScene::updateCamera(float dt)
 {
     auto visibleSize = Director::getInstance()->getVisibleSize();
 
     float currentX = world->getPositionX();
-    float targetX;
+    float targetX  = currentX;
 
-    if (!bossFightStarted)
+    // 🔥 1. Режим выхода из босса
+    if (exitingBossFight)
     {
-        // обычная камера за игроком
         float playerWorldX = player->getPositionX();
         targetX            = visibleSize.width * 0.5f - playerWorldX;
+
+        float newX = currentX + (targetX - currentX) * 3.0f * dt;
+
+        // ✅ clamp применяем
+        float minX = visibleSize.width - LEVEL_RIGHT;
+        float maxX = -LEVEL_LEFT;
+        newX       = std::clamp(newX, minX, maxX);
+
+        world->setPositionX(newX);
+
+        if (std::abs(newX - targetX) < 1.0f)
+        {
+            exitingBossFight = false;
+        }
+
+        return;
     }
-    else if (!cameraLockActive)
+
+    // 🔥 2. Боссфайт (движение к арене)
+    if (bossFightStarted && !cameraLockActive)
     {
-        // ПЛАВНОЕ ДВИЖЕНИЕ К АРЕНЕ
         targetX = cameraTargetX;
 
         float newX = currentX + (targetX - currentX) * 5.0f * dt;
         world->setPositionX(newX);
 
-        // проверка: дошли ли
         if (std::abs(newX - cameraTargetX) < 1.0f)
         {
             cameraLockActive = true;
@@ -388,14 +453,18 @@ void GameScene::updateCamera(float dt)
 
         return;
     }
-    else
+
+    // 🔥 3. Зафиксированная камера
+    if (bossFightStarted && cameraLockActive)
     {
-        // УЖЕ ЗАФИКСИРОВАНА
         world->setPositionX(cameraTargetX);
         return;
     }
 
-    // clamp (только для обычной камеры)
+    // 🔥 4. Обычная камера (ПОСЛЕ босса тоже сюда попадём)
+    float playerWorldX = player->getPositionX();
+    targetX            = visibleSize.width * 0.5f - playerWorldX;
+
     float minX = visibleSize.width - LEVEL_RIGHT;
     float maxX = -LEVEL_LEFT;
 
@@ -417,8 +486,6 @@ void GameScene::update(float dt)
         return;  // 🔥 отключаем всё остальное
     }
 
-    bool playerInsideArena = bossArena.containsPoint(player->getPosition());
-
     player->update(dt);
     physics.updatePhysics(player, dt);
 
@@ -435,22 +502,10 @@ void GameScene::update(float dt)
     updateEnemyAttack(dt);
     updateBossAttack(dt);
 
-    if (boss && playerInsideArena && !arenaLocked)
-    {
-        arenaLocked      = true;
-        bossFightStarted = true;
-
-        float wallWidth = 20.f;
-
-        physics.addCollider({ax::Rect(bossArena.getMinX() - wallWidth, 0, wallWidth, 1000), ColliderType::Solid});
-
-        physics.addCollider({ax::Rect(bossArena.getMaxX(), 0, wallWidth, 1000), ColliderType::Solid});
-
-        auto visibleSize   = Director::getInstance()->getVisibleSize();
-        float arenaCenterX = bossArena.getMidX();
-
-        cameraTargetX = visibleSize.width * 0.5f - arenaCenterX;
-    }
+    if (boss && !arenaLocked && isBossFightTriggered())
+        startBossFight();
+    if (boss && boss->isDead() && arenaLocked)
+        endBossFight();
 
     for (auto it = enemies.begin(); it != enemies.end();)
     {
@@ -461,11 +516,6 @@ void GameScene::update(float dt)
         }
         else
             ++it;
-    }
-
-    if (boss && boss->isDead())
-    {
-        // можно позже открыть арену или триггерить событие
     }
 
     updateCamera(dt);
