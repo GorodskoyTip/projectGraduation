@@ -7,7 +7,8 @@ class Player;
 enum class BossState
 {
     Idle,
-    Move,
+    Walk,
+    Run,
     Jump,
     Attack,
     Hit,
@@ -27,12 +28,15 @@ public:
     void setArena(const ax::Rect& rect);
     bool isFightStarted() const { return fightStarted; }
 
-    virtual void receiveDamage(float amount);
+    virtual void receiveDamage(float amount, int attackID);
+    virtual void onDeath();
     bool isDead() const { return state == BossState::Dead; }
 
     float getAttackDamage() { return attackDamage; }
     bool isAttackActive() const { return attackActive; }
     ax::Rect getHitBox() const { return hitBox; }
+
+    bool readyToRemove() const { return state == BossState::Dead && deathTimer <= 0.f; }
 
 protected:
     Player* target = nullptr;
@@ -61,6 +65,8 @@ protected:
     virtual void handleHit(float dt)    = 0;
     virtual void updateAttack(float dt) = 0;
     virtual void updateAnimation()      = 0;
+
+    int lastReceivedAttackID = -1;
 
 private:
     float deathTimer = 0;

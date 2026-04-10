@@ -28,24 +28,27 @@ ax::Rect Boss::getPhysicsRect() const
     return ax::Rect(pos.x - W / 2, pos.y - H, W, H);
 }
 
-void Boss::receiveDamage(float amount)
+void Boss::receiveDamage(float amount, int attackID)
 {
-    if (state == BossState::Dead)
+    if (lastReceivedAttackID == attackID)
         return;
 
-    hp -= amount;
+    lastReceivedAttackID = attackID;
+
+    hp    = std::max(0.0f, hp - amount);
+    //state = BossState::Hit;
+
+    AXLOG("Damage received by boss: %f", amount);
 
     if (hp <= 0)
-    {
-        state      = BossState::Dead;
-        setVelocityX(0);
-        setVelocityY(0);
-        deathTimer = 2.0f;
-    }
-    else
-        state = BossState::Hit;
+        onDeath();
+}
 
-    AXLOG("Damage received by Boss: %f", amount);
+void Boss::onDeath()
+{
+    state = BossState::Dead;
+    deathTimer = 2.f;
+    stopAllActions();
 }
 
 ax::Animation* Boss::createAnimation(const std::string& entity, const std::string& prefix, float delay)
@@ -78,6 +81,7 @@ void Boss::update(float dt)
     if (state == BossState::Dead)
     {
         deathTimer -= dt;
+        updateAnimation();
         return;
     }
 
@@ -94,14 +98,17 @@ void Boss::update(float dt)
     if (attackCooldown > 0)
         attackCooldown -= dt;
 
-    //updateAI(dt);
+    updateAI(dt);
 
     switch (state)
     {
     case BossState::Idle:
         handleIdle(dt);
         break;
-    case BossState::Move:
+    case BossState::Walk:
+        handleMove(dt);
+        break;
+    case BossState::Run:
         handleMove(dt);
         break;
     case BossState::Jump:

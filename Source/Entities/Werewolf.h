@@ -32,6 +32,7 @@ private:
     void startAttack();
 
     ax::Animation* idleAnim;
+    ax::Animation* walkAnim;
     ax::Animation* runAnim;
     ax::Animation* jumpAnim;
 
@@ -52,4 +53,9 @@ private:
     float hitTimer = 0.f;
 
     bool facingRight = true;
+
+    float runDistance      = 300.f;
+    float walkDistance     = 120.f;
+    float attackDistance   = 40.f;
+    float jumpHeightThresh = 20.f;
 };

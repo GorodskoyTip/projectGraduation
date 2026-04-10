@@ -48,6 +48,11 @@ bool GameScene::init()
     platform->setPosition(600, 150);
     world->addChild(platform);
 
+    physics.addCollider({ax::Rect(1000, 150, 150, 20), ColliderType::OneWay});
+    auto platform1 = ax::LayerColor::create(ax::Color4B::GREEN, 150, 20);
+    platform1->setPosition(1000, 150);
+    world->addChild(platform1);
+
     player = Player::create();
     player->setPosition(200, 240);
     world->addChild(player);
@@ -323,11 +328,11 @@ void GameScene::updatePlayerAttack(float dt)
         {
             if (player->getHitBox().intersectsRect(boss->getPhysicsRect()))
             {
-                boss->receiveDamage(player->getAttackDamage(player->getAttackType()));
+                boss->receiveDamage(player->getAttackDamage(player->getAttackType()), player->getAttackID());
             }
         }
     }
-    if (boss->isDead())
+    if (boss && boss->isDead())
     {
         exitingBossFight = true;
         cameraLockActive = false;
@@ -495,8 +500,11 @@ void GameScene::update(float dt)
         physics.updatePhysics(enemy, dt);
     }
 
-    boss->update(dt);
-    physics.updatePhysics(boss, dt);
+    if (boss)
+    {
+        boss->update(dt);
+        physics.updatePhysics(boss, dt);
+    }
 
     updatePlayerAttack(dt);
     updateEnemyAttack(dt);
@@ -516,6 +524,12 @@ void GameScene::update(float dt)
         }
         else
             ++it;
+    }
+
+    if (boss && boss->readyToRemove())
+    {
+        boss->removeFromParent();
+        boss = nullptr;
     }
 
     updateCamera(dt);

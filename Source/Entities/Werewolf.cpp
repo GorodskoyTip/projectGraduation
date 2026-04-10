@@ -35,15 +35,16 @@ bool Werewolf::init()
     setAnchorPoint(ax::Vec2(0.5f, 0.5f));
 
     idleAnim = createAnimation("werewolfWhite", "idle", 0.1f);
+    walkAnim = createAnimation("werewolfWhite", "walk", 0.07f);
     runAnim  = createAnimation("werewolfWhite", "run", 0.07f);
     jumpAnim = createAnimation("werewolfWhite", "jump", 0.08f);
 
-    attack1Anim = createAnimation("werewolfWhite", "attack1", 0.07f);
-    attack2Anim = createAnimation("werewolfWhite", "attack2", 0.07f);
-    attack3Anim = createAnimation("werewolfWhite", "attack3", 0.07f);
+    attack1Anim = createAnimation("werewolfWhite", "attack1", 0.1f);
+    attack2Anim = createAnimation("werewolfWhite", "attack2", 0.1f);
+    attack3Anim = createAnimation("werewolfWhite", "attack3", 0.1f);
 
     hitAnim   = createAnimation("werewolfWhite", "hurt", 0.05f);
-    deathAnim = createAnimation("werewolfWhite", "death", 0.05f);
+    deathAnim = createAnimation("werewolfWhite", "dead", 0.1f);
 
     if (!idleAnim || !runAnim || !attack1Anim)
     {
@@ -60,8 +61,13 @@ bool Werewolf::init()
 
 void Werewolf::updateAnimation()
 {
-    if (state == currentAnimationState && lastAttack == currentAttack)
-        return;
+    if (state == currentAnimationState)
+    {
+        if (state != BossState::Attack)
+            return;
+        if (lastAttack == currentAttack)
+            return;
+    }
 
     stopAllActions();
 
@@ -70,7 +76,10 @@ void Werewolf::updateAnimation()
     case BossState::Idle:
         runAction(RepeatForever::create(Animate::create(idleAnim)));
         break;
-    case BossState::Move:
+    case BossState::Walk:
+        runAction(RepeatForever::create(Animate::create(walkAnim)));
+        break;
+    case BossState::Run:
         runAction(RepeatForever::create(Animate::create(runAnim)));
         break;
     case BossState::Jump:
@@ -106,30 +115,49 @@ void Werewolf::updateAnimation()
 
 void Werewolf::updateAI(float dt)
 {
-    if (!target)
+    if (!target || target->getState() == PlayerState::Dead || state == BossState::Attack || state == BossState::Hit)
         return;
 
-    if (state == BossState::Attack || state == BossState::Hit)
+    auto myPos = getPosition();
+    auto playerPos = target->getPosition();
+
+    float dx = playerPos.x - myPos.x;
+    float dy = playerPos.y - myPos.y;
+
+    float absDx = std::abs(dx);
+
+    facingRight = dx > 0;
+    setFlippedX(!facingRight);
+
+    if (dy > jumpHeightThresh && onGround && target->isOnGround())
+    {
+        velocity.y = 500;
+        state      = BossState::Jump;
         return;
+    }
 
-    float dx = target->getPositionX() - getPositionX();
-    float dy = target->getPositionY() - getPositionY();
-
-    if (std::abs(dx) < 50 && attackCooldown <= 0)
+    if (absDx < attackDistance && attackCooldown <= 0)
     {
         startAttack();
         return;
     }
 
-    if (dy > 50 && onGround)
+    if (absDx <= attackDistance && attackCooldown > 0)
     {
-        state      = BossState::Jump;
-        velocity.y = 500;
-        velocity.x = dx * 2;
+        velocity.x = 0;
+        state      = BossState::Idle;
         return;
     }
 
-    state = BossState::Move;
+    if (absDx > walkDistance)
+    {
+        state = BossState::Run;
+        velocity.x = (dx > 0) ? 200.f : -200.f;
+        return;
+    }
+
+    state = BossState::Walk;
+    velocity.x = (dx > 0) ? 100.f : -100.f;
 }
 
 void Werewolf::handleIdle(float dt)
@@ -145,14 +173,6 @@ void Werewolf::handleIdle(float dt)
 
 void Werewolf::handleMove(float dt)
 {
-    float dx = target->getPositionX() - getPositionX();
-
-    velocity.x = (dx > 0) ? 150 : -150;
-
-    facingRight = dx > 0;
-
-    setFlippedX(!facingRight);
-
     if (!onGround)
         state = BossState::Jump;
 }
@@ -187,11 +207,6 @@ void Werewolf::handleHit(float dt)
 void Werewolf::handleAttack(float dt)
 {
     velocity.x = 0;
-
-    attackTimer -= dt;
-
-    if (attackTimer <= 0)
-        state = BossState::Idle;
 }
 
 void Werewolf::chooseAttack()
@@ -225,8 +240,6 @@ void Werewolf::startAttack()
         attackTimer       = attack3Anim->getDuration();
         attackActiveStart = attackTimer * 0.6f;
         attackActiveEnd   = attackTimer * 0.9f;
-
-        velocity.y = 500;
     }
 
     attackCooldown = 2.0f;
@@ -244,12 +257,12 @@ void Werewolf::updateAttack(float dt)
         attackActive = true;
 
         float width  = 50.f;
-        float height = 40.f;
+        float height = 80.f;
 
         auto pos      = getPosition();
-        float offsetX = facingRight ? -30.f : 30.f;
+        float offsetX = facingRight ? 30.f : -30.f;
 
-        hitBox = ax::Rect(pos.x + offsetX - width / 2, pos.y - height, width, height);
+        hitBox = ax::Rect(pos.x + offsetX - width / 2, pos.y - height / 1.5, width, height);
     }
     else
         attackActive = false;
