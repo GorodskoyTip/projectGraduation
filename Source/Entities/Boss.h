@@ -21,6 +21,8 @@ public:
     virtual bool initBase();
     virtual void update(float dt) override;
 
+    float getHP() { return hp; }
+
     void setTarget(Player* p) { target = p; }
 
     ax::Rect getPhysicsRect() const override;

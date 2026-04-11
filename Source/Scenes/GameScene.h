@@ -4,6 +4,7 @@
 #include "Core/Collider.h"
 #include "Core/PhysicsSystem.h"
 #include "Entities/EnemyTypes.h"
+#include "Menus/HUD.h"
 
 #include <vector>
 
@@ -43,6 +44,8 @@ public:
     void endBossFight();
 
 private:
+    HUD* hud = nullptr;
+
     PhysicsSystem physics;
 
     bool bossFightStarted = false;

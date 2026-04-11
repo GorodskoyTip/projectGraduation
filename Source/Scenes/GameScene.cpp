@@ -25,6 +25,10 @@ bool GameScene::init()
     if (!Scene::init())
         return false;
 
+    hud = HUD::create();
+    hud->setPosition(Vec2::ZERO);
+    this->addChild(hud, 1000);
+
     world = Node::create();
     this->addChild(world);
 
@@ -44,12 +48,12 @@ bool GameScene::init()
     world->addChild(wallR);
 
     physics.addCollider({ax::Rect(600, 150, 150, 20), ColliderType::OneWay});
-    auto platform = ax::LayerColor::create(ax::Color4B::GREEN, 150, 20);
+    auto platform = ax::LayerColor::create(ax::Color4B::BLUE, 150, 20);
     platform->setPosition(600, 150);
     world->addChild(platform);
 
     physics.addCollider({ax::Rect(1000, 150, 150, 20), ColliderType::OneWay});
-    auto platform1 = ax::LayerColor::create(ax::Color4B::GREEN, 150, 20);
+    auto platform1 = ax::LayerColor::create(ax::Color4B::BLUE, 150, 20);
     platform1->setPosition(1000, 150);
     world->addChild(platform1);
 
@@ -483,6 +487,18 @@ void GameScene::update(float dt)
 {
     if (!world || !player)
         return;
+
+    hud->setPlayerHP(player->getHP(), 100);
+
+    if (boss && bossFightStarted)
+    {
+        hud->showBossBar(true);
+        hud->setBossHP(boss->getHP(), 300);
+    }
+    else
+    {
+        hud->showBossBar(false);
+    }
 
     if (freeCamera)
     {
