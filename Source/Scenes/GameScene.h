@@ -22,6 +22,7 @@ class GameScene : public ax::Scene
 {
 public:
     static GameScene* create();
+    static ax::Scene* createScene();
     virtual bool init() override;
     virtual void update(float dt) override;
     void updateCamera(float dt);

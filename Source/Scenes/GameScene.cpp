@@ -20,6 +20,11 @@ GameScene* GameScene::create()
     return nullptr;
 }
 
+ax::Scene* GameScene::createScene()
+{
+    return GameScene::create();
+}
+
 bool GameScene::init()
 {
     if (!Scene::init())
