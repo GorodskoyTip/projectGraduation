@@ -16,18 +16,34 @@ bool MainMenu::init()
     auto visibleSize = _director->getVisibleSize();
     Vec2 origin      = _director->getVisibleOrigin();
 
-    auto title = Label::createWithTTF("MY GAME", "fonts/m6x11plus.ttf", 48);
+    auto background = Sprite::create("GUI/MainMenu/Background.png");
+    background->setPosition(origin + visibleSize / 2);
+    background->setScale(visibleSize.width / background->getContentSize().width,
+                         visibleSize.height / background->getContentSize().height);
+    addChild(background, -1);
+
+    auto title = Label::createWithTTF("The Good Old Tale\nof Red Riding Hood", "fonts/m6x11plus.ttf", 48);
     title->setPosition(origin + Vec2(visibleSize.width / 2, visibleSize.height - 100));
     addChild(title);
 
-    auto newGameItem  = MenuItemLabel::create(Label::createWithTTF("New Game", "fonts/m6x11plus.ttf", 32),
-                                              AX_CALLBACK_1(MainMenu::onNewGame, this));
-    auto continueItem = MenuItemLabel::create(Label::createWithTTF("Continue", "fonts/m6x11plus.ttf", 32),
-                                              AX_CALLBACK_1(MainMenu::onContinue, this));
-    auto settingsItem = MenuItemLabel::create(Label::createWithTTF("Settings", "fonts/m6x11plus.ttf", 32),
-                                              AX_CALLBACK_1(MainMenu::onSettings, this));
-    auto exitItem     = MenuItemLabel::create(Label::createWithTTF("Quit Game", "fonts/m6x11plus.ttf", 32),
-                                              AX_CALLBACK_1(MainMenu::onExit, this));
+    auto newGameItem  = MenuItemSprite::create(Sprite::create("GUI/MainMenu/NewGameButton.png"),
+                                               Sprite::create("GUI/MainMenu/HighlightButtonBig.png"),
+                                               AX_CALLBACK_1(MainMenu::onNewGame, this));
+    auto continueItem = MenuItemSprite::create(Sprite::create("GUI/MainMenu/ContinueButton.png"),
+                                               Sprite::create("GUI/MainMenu/HighlightButtonBig.png"),
+                                               AX_CALLBACK_1(MainMenu::onContinue, this));
+    auto settingsItem = MenuItemSprite::create(Sprite::create("GUI/MainMenu/SettingsButton.png"),
+                                               Sprite::create("GUI/MainMenu/HighlightButtonBig.png"),
+                                               AX_CALLBACK_1(MainMenu::onSettings, this));
+    auto exitItem     = MenuItemSprite::create(Sprite::create("GUI/MainMenu/QuitGameButton.png"),
+                                               Sprite::create("GUI/MainMenu/HighlightButtonBig.png"),
+                                               AX_CALLBACK_1(MainMenu::onExit, this));
+
+    newGameItem->setCallback([this](ax::Object* sender) {
+        auto item = static_cast<MenuItemSprite*>(sender);
+        item->runAction(Sequence::create(ScaleTo::create(0.1f, 1.1f), ScaleTo::create(0.1f, 1.0f), nullptr));
+        onNewGame(sender);
+    });
 
     auto menu = Menu::create(newGameItem, continueItem, settingsItem, exitItem, nullptr);
     menu->alignItemsVerticallyWithPadding(20);

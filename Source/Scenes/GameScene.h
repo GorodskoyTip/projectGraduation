@@ -5,6 +5,7 @@
 #include "Core/PhysicsSystem.h"
 #include "Entities/EnemyTypes.h"
 #include "Menus/HUD.h"
+#include "Menus/PauseMenu.h"
 
 #include <vector>
 
@@ -21,6 +22,9 @@ struct EnemySpawn
 class GameScene : public ax::Scene
 {
 public:
+
+    void generateLevelTest();
+
     static GameScene* create();
     static ax::Scene* createScene();
     virtual bool init() override;

@@ -60,7 +60,7 @@ bool Canine::init()
 
 void Canine::handleIdle(float dt)
 {
-    velocity.x = 0;
+    setVelocityX(0);
 
     if (!onGround)
         state = EnemyState::Fall;
@@ -71,30 +71,33 @@ void Canine::handleMove(float dt)
     float dx = target->getPositionX() - getPositionX();
 
     constexpr float TURN_THRESHOLD = 10.f;
+
     if (std::abs(dx) > TURN_THRESHOLD)
     {
         if (dx > 0)
         {
-            velocity.x = ENEMY_MOVE_SPEED;
+            setVelocityX(ENEMY_MOVE_SPEED);
             setFlippedX(true);
             facingRight = false;
         }
         else
         {
-            velocity.x = -ENEMY_MOVE_SPEED;
+            setVelocityX(-ENEMY_MOVE_SPEED);
             setFlippedX(false);
             facingRight = true;
         }
     }
     else
-        velocity.x = 0;
+    {
+        setVelocityX(0);
+    }
 }
 
 void Canine::handleFall(float dt) {}
 
 void Canine::handleAttack(float dt)
 {
-    velocity.x = 0;
+    setVelocityX(0);
 
     attackTimer -= dt;
 
@@ -105,7 +108,7 @@ void Canine::handleAttack(float dt)
 void Canine::handleHit(float dt)
 {
     if (onGround)
-        velocity.x = 0;
+        setVelocityX(0);
 
     hitTimer -= dt;
 
@@ -120,7 +123,8 @@ void Canine::handleHit(float dt)
 
 void Canine::handleDeath(float dt)
 {
-    velocity = Vec2::ZERO;
+    setVelocityX(0);
+    setVelocityY(0);
 
     if (deathTimer > 0)
         deathTimer -= dt;
@@ -170,7 +174,7 @@ void Canine::updateAI(float dt)
 
     if (dy > 0 && target->isOnGround() && absDx <= UNDER_PLAYER_X)
     {
-        velocity.x = 0;
+        setVelocityX(0);
 
         if (dx > 0)
         {

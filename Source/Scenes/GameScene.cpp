@@ -4,6 +4,15 @@
 #include "Entities/Werewolf.h"
 #include "Core/LevelBounds.h"
 
+#include "Level/LevelGenerator.h"
+#include "Level/TMXExporter.h"
+
+void GameScene::generateLevelTest()
+{
+    auto tiles = LevelGenerator::generate(100, 40);
+    TMXExporter::save(tiles, "D:/GameDev/Assets/Red Hood/tilemaps/test.tmx");
+}
+
 #include <iostream>
 
 USING_NS_AX;
@@ -29,6 +38,8 @@ bool GameScene::init()
 {
     if (!Scene::init())
         return false;
+
+    generateLevelTest();
 
     hud = HUD::create();
     hud->setPosition(Vec2::ZERO);
@@ -66,8 +77,8 @@ bool GameScene::init()
     player->setPosition(200, 240);
     world->addChild(player);
 
-    //spawnPoints.push_back({EnemyType::Canine, {400, 240}});
-    //spawnPoints.push_back({EnemyType::Canine, {700, 240}});
+    spawnPoints.push_back({EnemyType::Canine, {400, 240}});
+    spawnPoints.push_back({EnemyType::Canine, {700, 240}});
 
     for (auto& spawn : spawnPoints)
     {
@@ -141,6 +152,25 @@ void GameScene::onEnter()
             camLeft = true;
         if (keyCode == ax::EventKeyboard::KeyCode::KEY_D)
             camRight = true;
+
+        if (keyCode == ax::EventKeyboard::KeyCode::KEY_ESCAPE)
+        {
+            auto pause = this->getChildByName("PauseMenu");
+
+            if (pause)
+            {
+                Director::getInstance()->resume();
+                this->removeChildByName("PauseMenu");
+            }
+            else
+            {
+                auto pauseMenu = PauseMenu::create();
+                pauseMenu->setName("PauseMenu");
+
+                this->addChild(pauseMenu, 9999);
+                Director::getInstance()->pause();
+            }
+        }
     };
 
     listener->onKeyReleased = [this](ax::EventKeyboard::KeyCode keyCode, ax::Event*) {
@@ -154,7 +184,7 @@ void GameScene::onEnter()
             camRight = false;
     };
 
-    _eventDispatcher->addEventListenerWithFixedPriority(listener, 1);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
 void GameScene::onExit()
@@ -556,4 +586,5 @@ void GameScene::update(float dt)
     updateCamera(dt);
 
     drawDebug();
+
 }
