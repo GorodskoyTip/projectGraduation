@@ -617,5 +617,7 @@ void Player::update(float dt)
     }
 
     setVelocityY(getVelocity().y - GRAVITY * dt);
+    if (auto pos = getPosition().y < -10000)
+        receiveDamage(999999);
 
 }

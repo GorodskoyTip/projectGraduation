@@ -31,9 +31,10 @@ bool PhysicsSystem::hasGroundBelow(const ax::Vec2& point) const
 
 bool PhysicsSystem::hasWallAhead(const ax::Rect& rect, float dir) const
 {
-    float checkX = (dir > 0) ? rect.getMaxX() + 2 : rect.getMinX() - 2;
+    float offset = 1.f;
+    float checkX = (dir > 0) ? rect.getMaxX() + offset : rect.getMinX() - offset;
 
-    ax::Rect probe(checkX, rect.getMinY(), 2, rect.size.height);
+    ax::Rect probe(checkX, rect.getMinY() + 2, 2, rect.size.height - 4);
 
     for (const auto& col : colliders)
     {
@@ -122,12 +123,18 @@ void PhysicsSystem::moveAndCollideY(PhysicsEntity* body, float dt)
         {
             if (body->getVelocity().y < 0)
             {
-                float penetration = col.rect.getMaxY() - rectY.getMinY();
-                pos.y += penetration;
+                float prevBottom = rectY.getMinY() - body->getVelocity().y * dt;
 
-                sprite->setPosition(pos);
-                body->setVelocityY(0);
-                body->setOnGround(true);
+                // 🔥 ВАЖНО: проверка "падали сверху"
+                if (prevBottom >= col.rect.getMaxY())
+                {
+                    float penetration = col.rect.getMaxY() - rectY.getMinY();
+                    pos.y += penetration;
+
+                    sprite->setPosition(pos);
+                    body->setVelocityY(0);
+                    body->setOnGround(true);
+                }
             }
         }
     }
@@ -135,6 +142,13 @@ void PhysicsSystem::moveAndCollideY(PhysicsEntity* body, float dt)
 
 void PhysicsSystem::updatePhysics(PhysicsEntity* body, float dt)
 {
+    float velX = body->getVelocity().x;
+
+    if (velX > 0 && hasWallAhead(body->getPhysicsRect(), 1))
+        body->setVelocityX(0);
+    else if (velX < 0 && hasWallAhead(body->getPhysicsRect(), -1))
+        body->setVelocityX(0);
+
     moveAndCollideX(body, dt);
     moveAndCollideY(body, dt);
 }
