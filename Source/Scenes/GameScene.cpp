@@ -10,7 +10,7 @@
 void GameScene::generateLevelTest()
 {
     auto tiles = LevelGenerator::generate(100, 40);
-    TMXExporter::save(tiles, "D:/GameDev/Assets/Red Hood/tilemaps/test.tmx");
+    TMXExporter::save(tiles, "D:/GameDev/projectGraduation/Content/Level/test.tmx");
 }
 
 #include <iostream>
@@ -39,7 +39,7 @@ bool GameScene::init()
     if (!Scene::init())
         return false;
 
-    generateLevelTest();
+    // generateLevelTest();
 
     hud = HUD::create();
     hud->setPosition(Vec2::ZERO);
@@ -48,62 +48,58 @@ bool GameScene::init()
     world = Node::create();
     this->addChild(world);
 
-    physics.addCollider({ax::Rect(0, 0, 3000, 100), ColliderType::Solid});
-    auto ground = ax::LayerColor::create(ax::Color4B::RED, 3000, 100);
-    ground->setPosition(0, 0);
-    world->addChild(ground);
+    auto map = TMXTiledMap::create("Level/test.tmx");
+    if (!map)
+    {
+        AXLOG("FAILED TO LOAD TMX");
+        return false;
+    }
+    world->addChild(map);
 
-    physics.addCollider({ax::Rect(0, 0, 50, 1000), ColliderType::Solid});
-    auto wallL = ax::LayerColor::create(ax::Color4B::GRAY, 50, 1000);
-    wallL->setPosition(0, 0);
-    world->addChild(wallL);
+    auto layer = map->getLayer("Layer1");
 
-    physics.addCollider({ax::Rect(2950, 0, 50, 1000), ColliderType::Solid});
-    auto wallR = ax::LayerColor::create(ax::Color4B::GRAY, 50, 1000);
-    wallR->setPosition(2950, 0);
-    world->addChild(wallR);
+    auto mapSize = map->getMapSize();
+    AXLOG("Map: %d x %d", mapSize.width, mapSize.height);
+    auto tileSize = map->getTileSize();
+    AXLOG("Tile size: %f x %f", tileSize.width, tileSize.height);
+    worldWidth  = mapSize.width * tileSize.width;
+    worldHeight = mapSize.height * tileSize.height;
 
-    physics.addCollider({ax::Rect(600, 150, 150, 20), ColliderType::OneWay});
-    auto platform = ax::LayerColor::create(ax::Color4B::BLUE, 150, 20);
-    platform->setPosition(600, 150);
-    world->addChild(platform);
+    for (int x = 0; x < mapSize.width; x++)
+    {
+        for (int y = 0; y < mapSize.height; y++)
+        {
+            int gid = layer->getTileGIDAt(ax::Vec2(x, y));
 
-    physics.addCollider({ax::Rect(1000, 150, 150, 20), ColliderType::OneWay});
-    auto platform1 = ax::LayerColor::create(ax::Color4B::BLUE, 150, 20);
-    platform1->setPosition(1000, 150);
-    world->addChild(platform1);
+            if (gid == 0)
+                continue;
+
+            // 🔥 получаем свойства тайла
+            auto props = map->getPropertiesForGID(gid);
+
+            if (props.isNull())
+                continue;
+
+            // 🔥 проверяем solid
+            if (props.getType() == ax::Value::Type::MAP)
+            {
+                auto& mapProps = props.asValueMap();
+
+                if (mapProps.find("solid") != mapProps.end() && mapProps.at("solid").asBool())
+                {
+                    float worldX = x * tileSize.width;
+                    float worldY = (mapSize.height - y - 1) * tileSize.height;
+
+                    physics.addCollider(
+                        {ax::Rect(worldX, worldY, tileSize.width, tileSize.height), ColliderType::Solid});
+                }
+            }
+        }
+    }
 
     player = Player::create();
     player->setPosition(200, 240);
     world->addChild(player);
-
-    spawnPoints.push_back({EnemyType::Canine, {400, 240}});
-    spawnPoints.push_back({EnemyType::Canine, {700, 240}});
-
-    for (auto& spawn : spawnPoints)
-    {
-        Enemy* enemy = createEnemy(spawn.type);
-
-        if (!enemy)
-            continue;
-
-        enemy->setPosition(spawn.position);
-
-        world->addChild(enemy);
-        enemies.push_back(enemy);
-    }
-
-    for (auto enemy : enemies)
-    {
-        enemy->setTarget(player);
-    }
-
-    bossArena = ax::Rect(1000, 0, 800, 400);
-    boss      = Werewolf::create();
-    boss->setPosition(1800, 200);
-    boss->setTarget(player);
-    boss->setArena(bossArena);
-    world->addChild(boss);
 
     debugDraw = ax::DrawNode::create();
     world->addChild(debugDraw, 999);
@@ -458,19 +454,19 @@ void GameScene::updateCamera(float dt)
     float currentX = world->getPositionX();
     float targetX  = currentX;
 
-    // 🔥 1. Режим выхода из босса
+    // 🔥 Границы камеры из карты
+    float minX = visibleSize.width - worldWidth;
+    float maxX = 0.0f;
+
+    // 🔥 1. Выход из босса
     if (exitingBossFight)
     {
         float playerWorldX = player->getPositionX();
         targetX            = visibleSize.width * 0.5f - playerWorldX;
 
+        targetX = std::clamp(targetX, minX, maxX);
+
         float newX = currentX + (targetX - currentX) * 3.0f * dt;
-
-        // ✅ clamp применяем
-        float minX = visibleSize.width - LEVEL_RIGHT;
-        float maxX = -LEVEL_LEFT;
-        newX       = std::clamp(newX, minX, maxX);
-
         world->setPositionX(newX);
 
         if (std::abs(newX - targetX) < 1.0f)
@@ -481,36 +477,36 @@ void GameScene::updateCamera(float dt)
         return;
     }
 
-    // 🔥 2. Боссфайт (движение к арене)
+    // 🔥 2. Камера движется к арене босса
     if (bossFightStarted && !cameraLockActive)
     {
-        targetX = cameraTargetX;
+        float target = cameraTargetX;
 
-        float newX = currentX + (targetX - currentX) * 5.0f * dt;
+        target = std::clamp(target, minX, maxX);
+
+        float newX = currentX + (target - currentX) * 5.0f * dt;
         world->setPositionX(newX);
 
-        if (std::abs(newX - cameraTargetX) < 1.0f)
+        if (std::abs(newX - target) < 1.0f)
         {
             cameraLockActive = true;
-            world->setPositionX(cameraTargetX);
+            world->setPositionX(target);
         }
 
         return;
     }
 
-    // 🔥 3. Зафиксированная камера
+    // 🔥 3. Камера зафиксирована на арене
     if (bossFightStarted && cameraLockActive)
     {
-        world->setPositionX(cameraTargetX);
+        float clamped = std::clamp(cameraTargetX, minX, maxX);
+        world->setPositionX(clamped);
         return;
     }
 
-    // 🔥 4. Обычная камера (ПОСЛЕ босса тоже сюда попадём)
+    // 🔥 4. Обычная камера (следует за игроком)
     float playerWorldX = player->getPositionX();
     targetX            = visibleSize.width * 0.5f - playerWorldX;
-
-    float minX = visibleSize.width - LEVEL_RIGHT;
-    float maxX = -LEVEL_LEFT;
 
     targetX = std::clamp(targetX, minX, maxX);
 

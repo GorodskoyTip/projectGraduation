@@ -53,6 +53,9 @@ private:
 
     PhysicsSystem physics;
 
+    float worldWidth  = 0;
+    float worldHeight = 0;
+
     bool bossFightStarted = false;
     bool cameraLockActive = false;
     float cameraTargetX   = 0.f;
