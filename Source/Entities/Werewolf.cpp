@@ -25,7 +25,7 @@ bool Werewolf::init()
     if (!initBase())
         return false;
 
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Content/Sprites/WerewolfWhite/spriteSheetWerewolfWhite.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Sprites/WerewolfWhite/spriteSheetWerewolfWhite.plist");
 
     if (!initWithSpriteFrameName("werewolfWhite_idle_1.png"))
     {

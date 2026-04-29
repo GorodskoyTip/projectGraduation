@@ -3,6 +3,7 @@
 #include "axmol.h"
 #include "Core/Collider.h"
 #include "Core/PhysicsSystem.h"
+#include "Level/ParallaxSystem.h"
 #include "Entities/EnemyTypes.h"
 #include "Menus/HUD.h"
 #include "Menus/PauseMenu.h"
@@ -52,6 +53,7 @@ private:
     HUD* hud = nullptr;
 
     PhysicsSystem physics;
+    ParallaxSystem parallax;
 
     float worldWidth  = 0;
     float worldHeight = 0;

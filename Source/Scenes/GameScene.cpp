@@ -1,4 +1,5 @@
 #include "GameScene.h"
+#include "Core/PhysicsSystem.h"
 #include "Entities/Player.h"
 #include "Entities/Canine.h"
 #include "Entities/Werewolf.h"
@@ -7,15 +8,15 @@
 #include "Level/LevelGenerator.h"
 #include "Level/TMXExporter.h"
 
-void GameScene::generateLevelTest()
-{
-    auto tiles = LevelGenerator::generate(100, 40);
-    TMXExporter::save(tiles, "D:/GameDev/projectGraduation/Content/Level/test.tmx");
-}
-
 #include <iostream>
 
 USING_NS_AX;
+
+void GameScene::generateLevelTest()
+{
+    auto tiles = LevelGenerator::generate(300, 40);
+    TMXExporter::save(tiles, "Level/test.tmx");
+}
 
 GameScene* GameScene::create()
 {
@@ -39,7 +40,7 @@ bool GameScene::init()
     if (!Scene::init())
         return false;
 
-    // generateLevelTest();
+    //generateLevelTest();
 
     hud = HUD::create();
     hud->setPosition(Vec2::ZERO);
@@ -47,6 +48,10 @@ bool GameScene::init()
 
     world = Node::create();
     this->addChild(world);
+
+    player = Player::create();
+    player->setPosition(200, 500);
+    world->addChild(player);
 
     auto map = TMXTiledMap::create("Level/test.tmx");
     if (!map)
@@ -97,9 +102,74 @@ bool GameScene::init()
         }
     }
 
-    player = Player::create();
-    player->setPosition(200, 240);
-    world->addChild(player);
+    auto objectGroup = map->getObjectGroup("Spawns");
+    if (!objectGroup)
+    {
+        AXLOG("No Spawns layer found!");
+        return true;
+    }
+
+    if (objectGroup)
+    {
+        auto objects = objectGroup->getObjects();
+
+        for (auto& obj : objects)
+        {
+            auto dict = obj.asValueMap();
+
+            std::string name = dict["name"].asString();
+            std::string type = dict["type"].asString();
+
+            float x      = dict["x"].asFloat();
+            float y      = dict["y"].asFloat();
+            float height = dict["height"].asFloat();  // ВАЖНО
+
+            y = worldHeight - y - height;
+
+            if (name == "enemy")
+            {
+                Enemy* enemy = nullptr;
+
+                if (type == "canine")
+                    enemy = Canine::create();
+
+                enemy->setPosition(x, y);
+                enemy->setTarget(player);
+                world->addChild(enemy);
+
+                enemies.push_back(enemy);
+            }
+
+            if (name == "boss")
+            {
+                boss = Werewolf::create();
+                boss->setPosition(x, y);
+                boss->setTarget(player);
+
+                float arenaWidth = 750.f;
+
+                float minX = x - arenaWidth / 2;
+
+                minX = std::clamp(minX, 0.f, worldWidth - arenaWidth);
+
+                ax::Rect arenaRect(minX, 0, arenaWidth, worldHeight);
+
+                boss->setArena(arenaRect);
+
+                bossArena = arenaRect;
+
+                world->addChild(boss);
+            }
+        }
+    }
+
+    parallax.addLayer("Tilesets/Swamp/2 Background/Layers/1.png", 0.1f, -10, this);
+    parallax.addLayer("Tilesets/Swamp/2 Background/Layers/2.png", 0.3f, -5, this);
+    parallax.addLayer("Tilesets/Swamp/2 Background/Layers/3.png", 0.6f, -2, this);
+    parallax.addLayer("Tilesets/Swamp/2 Background/Layers/4.png", 0.9f, 0, this);
+
+    parallax.addLayer("Tilesets/Swamp/2 Background/Layers/5.png", 1.2f, 10, this);
+
 
     debugDraw = ax::DrawNode::create();
     world->addChild(debugDraw, 999);
@@ -405,7 +475,9 @@ void GameScene::updateBossAttack(float dt)
 
 bool GameScene::isBossFightTriggered() const
 {
-    ax::Rect bossTriggerZone = ax::Rect(bossArena.getMidX() - 100, bossArena.getMinY(), 200, bossArena.size.height);
+    float triggerWidth = 200.f;
+
+    ax::Rect bossTriggerZone(bossArena.getMinX() + 50, bossArena.getMinY(), triggerWidth, bossArena.size.height);
     return bossTriggerZone.containsPoint(player->getPosition());
 }
 
@@ -538,6 +610,9 @@ void GameScene::update(float dt)
         return;  // 🔥 отключаем всё остальное
     }
 
+    float camX = -world->getPositionX();
+    parallax.update(camX);
+
     player->update(dt);
     physics.updatePhysics(player, dt);
 
@@ -545,6 +620,7 @@ void GameScene::update(float dt)
     {
         enemy->update(dt);
         physics.updatePhysics(enemy, dt);
+        //AXLOG("Enemies count: %d", (int)enemies.size());
     }
 
     if (boss)

@@ -25,7 +25,7 @@ Player* Player::create()
 
 bool Player::init()
 {
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Content/Sprites/RedHood/spriteSheetRedHood.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Sprites/RedHood/spriteSheetRedHood.plist");
 
     if (!initWithSpriteFrameName("redHood_idle_1.png"))
     {
@@ -66,7 +66,7 @@ void Player::onKeyPressed(EventKeyboard::KeyCode key, Event*)
         if (key == EventKeyboard::KeyCode::KEY_R)
         {
             hp = 100;
-            setPosition(200, 240);
+            setPosition(200, 500);
             state = PlayerState::Idle;
         }
     }

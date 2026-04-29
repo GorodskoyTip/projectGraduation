@@ -94,6 +94,7 @@ ax::Animation* Enemy::createAnimation(const std::string& entity, const std::stri
 
 void Enemy::update(float dt)
 {
+    //AXLOG("Enemy state: %d", (int)state);
     if (state == EnemyState::Dead)
     {
         handleDeath(dt);

@@ -19,13 +19,13 @@ Canine* Canine::create()
 
 bool Canine::init()
 {
-    if (!Sprite::init())
+    if (!Sprite::init() || !Enemy::init())
         return false;
 
     if (!initBase())
         return false;
 
-    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Content/Sprites/WolfBlack/spriteSheetWolfBlack.plist");
+    SpriteFrameCache::getInstance()->addSpriteFramesWithFile("Sprites/WolfBlack/spriteSheetWolfBlack.plist");
 
     if (!initWithSpriteFrameName("wolfBlack_idle_1.png"))
     {
@@ -147,7 +147,7 @@ void Canine::updateAI(float dt)
     float absDx = std::abs(dx);
     float absDy = std::abs(dy);
 
-    constexpr float HEIGHT_TOLERANCE = 5.f;
+    constexpr float HEIGHT_TOLERANCE = 20.f;
     constexpr float ATTACK_HEIGHT      = 20.f;
     constexpr float CHASE_HEIGHT_LIMIT = 60.f;
     constexpr float UNDER_PLAYER_X     = 30.f;
@@ -192,6 +192,7 @@ void Canine::updateAI(float dt)
     }
 
     state = EnemyState::Move;
+    //AXLOG("AI running, target = %p", target);
 }
 
 void Canine::startAttack()

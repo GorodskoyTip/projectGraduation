@@ -9,7 +9,7 @@ void TMXExporter::save(const std::vector<std::vector<int>>& tiles, const std::st
     int width  = tiles[0].size();
 
     // 1. Читаем template.tmx
-    std::ifstream in("D:/GameDev/projectGraduation/Content/Level/template.tmx");
+    std::ifstream in("Level/template.tmx");
     if (!in.is_open())
         std::cout << "FAILED TO OPEN TEMPLATE\n";
     std::stringstream buffer;

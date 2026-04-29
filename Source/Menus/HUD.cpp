@@ -8,23 +8,23 @@ bool HUD::init()
     auto visibleSize = ax::Director::getInstance()->getVisibleSize();
 
     // ================= PLAYER =================
-    playerBg = ax::Sprite::create("Content/GUI/HUD/ValueBar.png");
+    playerBg = ax::Sprite::create("GUI/HUD/ValueBar.png");
     playerBg->setAnchorPoint(ax::Vec2(0, 1));  // левый верх
     playerBg->setPosition(20, visibleSize.height - 20);
     addChild(playerBg);
 
-    playerFill = ax::Sprite::create("Content/GUI/HUD/ValueRed.png");
+    playerFill = ax::Sprite::create("GUI/HUD/ValueRed.png");
     playerFill->setAnchorPoint(ax::Vec2(0, 1));  // ВАЖНО
     playerFill->setPosition(ax::Vec2(4, 12));
     playerBg->addChild(playerFill);
 
     // ================= BOSS =================
-    bossBg = ax::Sprite::create("Content/GUI/HUD/ValueBarBig.png");
+    bossBg = ax::Sprite::create("GUI/HUD/ValueBarBig.png");
     bossBg->setAnchorPoint(ax::Vec2(0.5f, 0));
     bossBg->setPosition(visibleSize.width / 2, 30);
     addChild(bossBg);
 
-    bossFill = ax::Sprite::create("Content/GUI/HUD/ValueRedBig.png");
+    bossFill = ax::Sprite::create("GUI/HUD/ValueRedBig.png");
     bossFill->setAnchorPoint(ax::Vec2(0, 0));
     bossFill->setPosition(ax::Vec2(4, 4));
     bossBg->addChild(bossFill);
